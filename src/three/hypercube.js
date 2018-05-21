@@ -39,7 +39,7 @@ class Hypercube {
       opacity: 0.2,
       transparent: true,
       // side: THREE.DoubleSide,
-      depthTest: false,
+      // depthTest: false,
     });
 
     const meshBuffer = new THREE.BufferGeometry();

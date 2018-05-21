@@ -2,6 +2,7 @@
 
 import TWEEN from 'tween';
 
+require('three/examples/js/loaders/GLTFLoader.js');
 require('three/examples/js/loaders/OBJLoader.js');
 require('three/examples/js/loaders/ColladaLoader.js');
 require('three/examples/js/controls/TrackballControls.js');
@@ -42,6 +43,7 @@ class Scene {
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
+      autoClear: false,
     });
 
     this.renderer.sortObjects = false;
@@ -58,7 +60,7 @@ class Scene {
     }
 
     this.camera = new THREE.PerspectiveCamera(20, this.w / this.h, 0.001, 1000000);
-    // window.camera = this.camera;
+    window.camera = this.camera;
 
     this.camera.position.set(0, 0, 2);
 
@@ -77,6 +79,8 @@ class Scene {
 
     this.initVR();
 
+    this.initOverlay();
+
     if (config.debug) {
       this.stats = new Stats();
       document.body.appendChild(this.stats.dom);
@@ -84,6 +88,56 @@ class Scene {
 
     this.addEventListeners();
     this.animate();
+  }
+
+  initOverlay() {
+    const material = new THREE.RawShaderMaterial({
+      vertexShader: require('../glsl/shader.vert'),
+      fragmentShader: require('../glsl/shader.frag'),
+      uniforms: {
+        time: { type: 'f', value: 0 },
+        alpha: { type: 'f', value: 1 }
+      }
+    });
+
+    let geometry = new THREE.OctahedronBufferGeometry(1, 3);
+    geometry.center();
+    geometry.computeVertexNormals();
+
+    this.overlay = new THREE.Mesh(geometry, material);
+    this.scene.add(this.overlay);
+
+    this.overlay.material.uniforms.time.value = 4.7;
+    this.overlay.geometry.scale(1, 1, 1);
+
+    this.overlay.material.side = THREE.DoubleSide;
+    this.overlay.material.transparent = true;
+  }
+
+  fadeOverlay(direction, length) {
+    let start = {};
+    let end = {};
+    if (direction === 'out') {
+      this.overlay.material.uniforms.time.value = 4.7;
+
+      start = { time: this.overlay.material.uniforms.time.value, size: 1, alpha: 1 };
+      end = { time: 7.1, alpha: 0};
+    } else {  
+      this.overlay.material.uniforms.time.value = 7.1;
+
+      start = { time: this.overlay.material.uniforms.time.value, size: 0, alpha: 0 };
+      end = { time: 4.7, alpha: 1 };
+    }
+  
+    let that = this;
+    new TWEEN.Tween(start)
+        .to(end, length)
+        .easing(TWEEN.Easing.Linear.None)
+        .onUpdate(function() {
+          that.overlay.material.uniforms.time.value = this.time;
+          that.overlay.material.uniforms.alpha.value = this.alpha;
+        })
+        .start();
   }
 
   initVR() { // Init vr controls / view, listen for button presses, etc
@@ -96,42 +150,63 @@ class Scene {
       this.vr.buttonAStream
         .distinctUntilChanged()
         .filter(x => x)
-        .subscribe((x) => {this.toggleWireframe(this.brain);});
+        .subscribe((x) => {
+          this.fadeOverlay('out', 2000);
+        });
 
       this.vr.buttonBStream
         .distinctUntilChanged()
         .filter(x => x)
-        .subscribe((x) => {this.toggleWireframe(this.brain);});
+        .subscribe((x) => {
+          // this.fadeOverlay('in', 1000);
+          this.scene = new THREE.Scene();
+        });
 
       this.vr.buttonXStream
         .distinctUntilChanged()
         .filter(x => x)
-        .subscribe((x) => {this.toggleWireframe(this.skull);});
+        .subscribe((x) => {
+          this.fadeOverlay('out', 2000);
+        });
+
+      this.vr.buttonYStream
+        .distinctUntilChanged()
+        .filter(x => x)
+        .subscribe((x) => {
+          this.fadeOverlay('in', 1000);
+        });
 
       this.vr.leftStickStream
         // .distinctUntilChanged()
         .filter(x => Math.abs(x[1])>0.1)
         .subscribe((x) => {
-          // console.log(x)
-          this.changeOpacity(this.brain, -(x[1]/1000));});
+        });
 
       this.vr.rightStickStream
         // .distinctUntilChanged()
         .filter(x => Math.abs(x[1])>0.1)
-        .subscribe((x) => {this.changeOpacity(this.skull, -(x[1]/1000));});
+        .subscribe((x) => {
+        });
     }
   }
 
   addContent() { // Add assets to scene
     this.hc = new Hypercube(this.scene);
     this.hypercube = this.hc.getHypercube();
-    this.hypercube.scale.set(0.05, 0.05, 0.05);
+    this.hypercube.scale.set(0.5, 0.5, 0.5);
     this.scene.add(this.hypercube);
+
+    this.loadGLTF('models/gltf/the_great_drawing_room/scene.gltf', {}, (gltf) => {
+      gltf.scale.set(0.5, 0.5, 0.5);
+      gltf.position.set(0, -0.575, 0);
+      this.fadeOverlay('out', 2000);
+      this.scene.add(gltf);
+    });
   }
 
   addLights() { // Add lights to scene
 		this.scene.add( new THREE.AmbientLight( 0xFFFFFF ) );
-		var directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.125 );
+		let directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.125 );
 		directionalLight.position.y = 10;
 		directionalLight.position.normalize();
 		this.scene.add( directionalLight );
@@ -222,16 +297,14 @@ class Scene {
       this.controls.enabled = false;
       this.removeEventListeners(); // make sure mouse events, etc aren't interfering with VR.
 
-      // this.head.position.set(-0.0021, 1.6715, -1.7996);
-      // this.eeg_pc.dotScale = 2.5;
+      this.hypercube.position.set(0, 2.5, 0);
 
       this.initEnvironment();
     } else { // app is not in vr mode
       this.controls.enabled = true;
       this.addEventListeners(); // re-enable mouse control when VR is finished
 
-      // this.head.position.set(0, 0, 0);
-      // this.eeg_pc.dotScale = 5;
+      this.hypercube.position.set(0, 2.5, 0);
 
       this.removeEnvironment();
     }
@@ -316,6 +389,17 @@ class Scene {
     });
   }
 
+  loadGLTF(url, options, cb) { // Simple interface for loading gltf files
+    new THREE.GLTFLoader().load(url, (gltf) => {
+        // gltf.scene.traverse( function ( child ) {
+        //   if ( child.isMesh ) {
+        //     child.material.envMap = envMap;
+        //   }
+        // } );
+      cb(gltf.scene);
+    });
+  }
+
   animate() {
     if (this.vr && this.vr.vrEffect) {
       this.vr.vrEffect.requestAnimationFrame(this.animate.bind(this));
@@ -326,6 +410,12 @@ class Scene {
     this.controls.update();
     if (TWEEN) { TWEEN.update(); }
     if (this.hc) { this.hc.update(window.performance.now()); }
+
+    if (this.overlay) {
+      this.overlay.position.copy(this.camera.position.clone());
+      // this.overlay.material.uniforms.time.value += 0.01;
+      // console.log(this.overlay.material.uniforms.time.value);
+    }
 
     // update stats
     if (config.debug) {
@@ -340,6 +430,7 @@ class Scene {
       this.vr.render(this.vr);
     }
 
+    
     this.renderer.render(this.scene, this.camera);
   }
 
