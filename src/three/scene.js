@@ -18,6 +18,8 @@ import Hypercube from './hypercube';
 
 class Scene {
   constructor() {
+    window._scene = this;
+
     this.renderer = null;
     this.scene = null;
     this.camera = null;
@@ -32,6 +34,27 @@ class Scene {
     this.stats = null;
 
     this.hypercube = null;
+    this.rooms = [
+      {name: 'the_great_drawing_room', position: new THREE.Vector3(0, -0.575, 0), scale: 0.5},
+      {name: 'the_smoking_room', position: new THREE.Vector3(0, -0.32, 0), scale: 0.3},
+      {name: 'the_morning_room', position: new THREE.Vector3(0, -0.345, 0), scale: 0.3},
+      {name: 'the_billiards_room', position: new THREE.Vector3(0, -0.575, 0), scale: 0.5},
+    ];
+    this.currentRoom = 0;
+    this.cubeRotating = false;
+    this.roomAnimating = false;
+
+    let assetCheck = 1;
+    this.rooms.forEach((room) => {
+      this.loadRoom(room.name, (gltf) => {
+        assetCheck++;
+        room.gltf = gltf;
+
+        if (assetCheck == this.rooms.length) {
+          this.changeRoom(this.rooms[this.currentRoom].name);
+        }
+      });
+    });
   }
 
   initScene() { // Initialize the basic threejs stuff
@@ -62,12 +85,12 @@ class Scene {
     this.camera = new THREE.PerspectiveCamera(20, this.w / this.h, 0.001, 1000000);
     window.camera = this.camera;
 
-    this.camera.position.set(0, 0, 2);
-
+    this.camera.position.set(0, 1, 0);
+  
     this.scene.add(this.camera);
 
     this.controls = new THREE.TrackballControls(this.camera);
-    this.controls.target = new THREE.Vector3(0, 0, 0);
+    this.controls.target = new THREE.Vector3(0, 1, -1);
     // window.controls = this.controls;
 
     this.configControls();
@@ -75,7 +98,8 @@ class Scene {
     // attach this.renderer to DOM
     this.container.append(this.renderer.domElement);
 
-    this.addContent();
+    this.addHypercube();
+    // this.changeRoom(this.rooms[this.currentRoom].name);
 
     this.initVR();
 
@@ -105,6 +129,7 @@ class Scene {
     geometry.computeVertexNormals();
 
     this.overlay = new THREE.Mesh(geometry, material);
+    this.overlay.position.set(0, 1, 0);
     this.scene.add(this.overlay);
 
     this.overlay.material.uniforms.time.value = 4.7;
@@ -114,7 +139,7 @@ class Scene {
     this.overlay.material.transparent = true;
   }
 
-  fadeOverlay(direction, length) {
+  fadeOverlay(direction, length, cb) {
     let start = {};
     let end = {};
     if (direction === 'out') {
@@ -137,6 +162,7 @@ class Scene {
           that.overlay.material.uniforms.time.value = this.time;
           that.overlay.material.uniforms.alpha.value = this.alpha;
         })
+        .onComplete(cb)
         .start();
   }
 
@@ -147,60 +173,190 @@ class Scene {
     this.vrPoseControl = new VRPoseControl(this.hypercube, this.vr);
     if (this.vr) {
       this.vrPoseControl.startPoseControl();
+      
+      this.vr.leftTriggerStream
+        .distinctUntilChanged()
+        .filter(x => x)
+        .subscribe((x) => {
+          this.changeRoom(this.rooms[this.currentRoom].name);
+        });
+
+      this.vr.rightTriggerStream
+        .distinctUntilChanged()
+        .filter(x => x)
+        .subscribe((x) => {
+          this.changeRoom(this.rooms[this.currentRoom].name);
+        });
+
       this.vr.buttonAStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.fadeOverlay('out', 2000);
+          this.changeRoom(this.rooms[this.currentRoom].name);
         });
 
       this.vr.buttonBStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          // this.fadeOverlay('in', 1000);
-          this.scene = new THREE.Scene();
+          this.changeRoom(this.rooms[this.currentRoom].name);
         });
 
       this.vr.buttonXStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.fadeOverlay('out', 2000);
+          this.changeRoom(this.rooms[this.currentRoom].name);
         });
 
       this.vr.buttonYStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.fadeOverlay('in', 1000);
+          this.changeRoom(this.rooms[this.currentRoom].name);
         });
 
       this.vr.leftStickStream
         // .distinctUntilChanged()
-        .filter(x => Math.abs(x[1])>0.1)
+        .filter(x => Math.abs(x[1]) > 0.1)
         .subscribe((x) => {
+          if (x[0] < -0.25) {
+            this.rotateHypercube('left', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+            });
+          } else if (x[0] > 0.25) {
+            this.rotateHypercube('right', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+            });
+          }
+
+          if (x[1] < -0.25) {
+            this.rotateHypercube('up', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+            });
+          } else if (x[1] > 0.25) {
+            this.rotateHypercube('down', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+            });
+          }
         });
 
       this.vr.rightStickStream
         // .distinctUntilChanged()
-        .filter(x => Math.abs(x[1])>0.1)
+        .filter(x => Math.abs(x[1]) > 0.1)
         .subscribe((x) => {
+          if (x[0] > 0.25) {
+            this.rotateHypercube('left', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+            });
+          } else if (x[0] < -0.25) {
+            this.rotateHypercube('right', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+            });
+          }
+
+          if (x[1] < -0.25) {
+            this.rotateHypercube('up', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+            });
+          } else if (x[1] > 0.25) {
+            this.rotateHypercube('down', 1000, () => {
+              this.cubeRotating = false;
+              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+            });
+          }
         });
     }
   }
 
-  addContent() { // Add assets to scene
+  rotateHypercube(direction, length, cb) {
+    let start = {};
+    let end = {};
+    
+    switch(direction) {
+      case 'up':
+        start = this.hypercube.rotation.clone();
+        end = new THREE.Vector3(this.hypercube.rotation.x - (Math.PI / 2), this.hypercube.rotation.y, this.hypercube.rotation.z);
+        break;
+        
+      case 'down':
+        start = this.hypercube.rotation.clone();
+        end = new THREE.Vector3(this.hypercube.rotation.x + (Math.PI / 2), this.hypercube.rotation.y, this.hypercube.rotation.z);
+        break;
+      
+        case 'left':
+        start = this.hypercube.rotation.clone();
+        end = new THREE.Vector3(this.hypercube.rotation.x, this.hypercube.rotation.y - (Math.PI / 2), this.hypercube.rotation.z);
+        break;
+      
+        case 'right':
+        start = this.hypercube.rotation.clone();
+        end = new THREE.Vector3(this.hypercube.rotation.x, this.hypercube.rotation.y + (Math.PI / 2), this.hypercube.rotation.z);
+        break;
+    }
+  
+    if (!this.cubeRotating) {
+      this.cubeRotating = true;
+      let that = this;
+      new TWEEN.Tween(start)
+          .to(end, length)
+          .easing(TWEEN.Easing.Linear.None)
+          .onUpdate(function() {
+            that.hypercube.rotation.copy(this);
+            this.cubeRotating = true;
+          })
+          .onComplete(cb)
+          .start();
+    }
+  }
+
+  addHypercube() { // Add assets to scene
     this.hc = new Hypercube(this.scene);
     this.hypercube = this.hc.getHypercube();
     this.hypercube.scale.set(0.5, 0.5, 0.5);
-    this.scene.add(this.hypercube);
+    this.hypercube.position.copy(new THREE.Vector3(0, 1, -2));
+    this.scene.add(this.hypercube); 
+  }
 
-    this.loadGLTF('models/gltf/the_great_drawing_room/scene.gltf', {}, (gltf) => {
-      gltf.scale.set(0.5, 0.5, 0.5);
-      gltf.position.set(0, -0.575, 0);
-      this.fadeOverlay('out', 2000);
-      this.scene.add(gltf);
+  loadRoom(roomName, cb) {
+    this.loadGLTF('models/gltf/' + roomName + '/scene.gltf', {}, (gltf) => {
+      cb(gltf);
+    });
+  }
+
+  changeRoom(roomName) {
+    if (!this.roomAnimating) {
+      this.roomAnimating = true;
+      if (this.room) { this.scene.remove(this.room); }
+      this.room = _.filter(this.rooms, (room) => { return room.name == roomName; })[0].gltf;
+      this.room.scale.set(this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale);
+      this.room.position.copy(this.rooms[this.currentRoom].position.clone());
+      this.scene.add(this.room);
+
+      this.fadeOverlay('out', 2000, () => {
+        this.roomAnimating = false;
+      });
+    }
+  }
+
+  loadPrevRoom() {
+    this.fadeOverlay('in', 1000, () => {
+      (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+      this.changeRoom(this.rooms[this.currentRoom].name);
+    });
+  }
+
+  loadNextRoom() {
+    this.fadeOverlay('in', 1000, () => {
+      (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+      this.changeRoom(this.rooms[this.currentRoom].name);
     });
   }
 
@@ -297,14 +453,10 @@ class Scene {
       this.controls.enabled = false;
       this.removeEventListeners(); // make sure mouse events, etc aren't interfering with VR.
 
-      this.hypercube.position.set(0, 2.5, 0);
-
       this.initEnvironment();
     } else { // app is not in vr mode
       this.controls.enabled = true;
       this.addEventListeners(); // re-enable mouse control when VR is finished
-
-      this.hypercube.position.set(0, 2.5, 0);
 
       this.removeEnvironment();
     }
@@ -412,7 +564,7 @@ class Scene {
     if (this.hc) { this.hc.update(window.performance.now()); }
 
     if (this.overlay) {
-      this.overlay.position.copy(this.camera.position.clone());
+      // this.overlay.position.copy(this.camera.position.clone());
       // this.overlay.material.uniforms.time.value += 0.01;
       // console.log(this.overlay.material.uniforms.time.value);
     }

@@ -17,7 +17,7 @@ class Hypercube {
 
   drawHypercube() {
     const lineMaterial = new THREE.LineBasicMaterial({
-      color: 0x00ccff,
+      color: 0xFFFFFF,
       transparent: true,
       opacity: 0.6,
     });
@@ -35,8 +35,8 @@ class Hypercube {
     this.hypercube.add(line);
 
     const hypermaterial = new THREE.MeshBasicMaterial({
-      color: 0xff,
-      opacity: 0.2,
+      color: 0x000000,
+      opacity: 0.5,
       transparent: true,
       // side: THREE.DoubleSide,
       // depthTest: false,
