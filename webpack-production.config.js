@@ -90,6 +90,10 @@ module.exports = {
       {
         from: resolve(__dirname, config.copy.textures.src),
         to: resolve(__dirname, config.copy.textures.dest),
+			},
+			{
+        from: resolve(__dirname, config.copy.bmfonts.src),
+        to: resolve(__dirname, config.copy.bmfonts.dest),
       },
     ]),
 		new webpack.ProvidePlugin({
@@ -100,6 +104,8 @@ module.exports = {
       'window.jQuery': 'jquery',
       THREE: 'three',
       'window.THREE': 'three',
+      TWEEN: 'tween.js',
+      'window.TWEEN': 'tween.js',
     }),
 
     new webpack.optimize.CommonsChunkPlugin({

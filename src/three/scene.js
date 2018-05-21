@@ -1,7 +1,5 @@
 //Main threejs scene
 
-import TWEEN from 'tween';
-
 require('three/examples/js/loaders/GLTFLoader.js');
 require('three/examples/js/loaders/OBJLoader.js');
 require('three/examples/js/loaders/ColladaLoader.js');
@@ -15,6 +13,9 @@ import VR from './vr/vr';
 import VRPoseControl from './vrPoseControl';
 
 import Hypercube from './hypercube';
+
+import loadFont from 'load-bmfont';
+import PanelGroup from './PanelGroup';
 
 class Scene {
   constructor() {
@@ -43,6 +44,9 @@ class Scene {
     this.currentRoom = 0;
     this.cubeRotating = false;
     this.roomAnimating = false;
+    this.gltfReady = false;
+    this.fontsReady = false;
+    this.waitingRoom = true;
 
     let assetCheck = 1;
     this.rooms.forEach((room) => {
@@ -51,9 +55,57 @@ class Scene {
         room.gltf = gltf;
 
         if (assetCheck == this.rooms.length) {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          this.addRoom(this.rooms[this.currentRoom].name);
+          this.gltfReady = true;
+          this.showReadyMessage(this.gltfReady, this.fontsReady);
         }
       });
+    });
+
+      window.fonts = [
+        {
+            name: 'bold',
+            json: '/bmFont/lato-bold.json',
+            png: '/bmFont/lato-bold.png',
+            font: null,
+            texture: null,
+        },
+        {
+            name: 'regular',
+            json: '/bmFont/lato-regular.json',
+            png: '/bmFont/lato-regular.png',
+            font: null,
+            texture: null,
+        },
+    ];
+    this.loadFonts(window.fonts);
+  }
+
+  startExperience() {
+    this.waitingRoom = false;
+    this.pg.destroyPanels();
+    this.fadeOverlay('out', 2000, () => {});
+  }
+
+  showReadyMessage(gltf, fonts) {
+    if (gltf && fonts) {
+      this.initPanelGroup();
+    }
+  }
+  loadFonts(fontList) {
+    _.each(fontList, (fontDef) => {
+        loadFont(fontDef.json, (err, font) => {
+            if (err) throw err;
+            THREE.ImageUtils.loadTexture(fontDef.png, undefined, (texture) => {
+                fontDef.font = font;
+                fontDef.texture = texture;
+                if (_.filter(fontList, 'font').length === fontList.length) {
+                    // all fonts are loaded
+                    this.fontsReady = true;
+                    this.showReadyMessage(this.gltfReady, this.fontsReady);
+                }
+            });
+        });
     });
   }
 
@@ -112,6 +164,16 @@ class Scene {
 
     this.addEventListeners();
     this.animate();
+  }
+
+  initPanelGroup() {
+    
+    this.pg = new PanelGroup();
+    this.pg.drawPanels({}, window.fonts);
+    this.panelsGroup = this.pg.getPanelsGroup();
+    this.panelsGroup.position.y = 1;
+    this.panelsGroup.position.z = -0.75;
+    this.scene.add(this.panelsGroup);
   }
 
   initOverlay() {
@@ -178,70 +240,98 @@ class Scene {
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            this.changeRoom(this.rooms[this.currentRoom].name);
+          }
         });
 
       this.vr.rightTriggerStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            this.changeRoom(this.rooms[this.currentRoom].name);
+          }
         });
 
       this.vr.buttonAStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            this.changeRoom(this.rooms[this.currentRoom].name);
+          }
         });
 
       this.vr.buttonBStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            this.changeRoom(this.rooms[this.currentRoom].name);
+          }
         });
 
       this.vr.buttonXStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            this.changeRoom(this.rooms[this.currentRoom].name);
+          }
         });
 
       this.vr.buttonYStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          this.changeRoom(this.rooms[this.currentRoom].name);
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            this.changeRoom(this.rooms[this.currentRoom].name);
+          }
         });
 
       this.vr.leftStickStream
         // .distinctUntilChanged()
         .filter(x => Math.abs(x[1]) > 0.1)
         .subscribe((x) => {
-          if (x[0] < -0.25) {
-            this.rotateHypercube('left', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
-            });
-          } else if (x[0] > 0.25) {
-            this.rotateHypercube('right', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
-            });
-          }
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            if (x[0] < -0.25) {
+              this.rotateHypercube('left', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+              });
+            } else if (x[0] > 0.25) {
+              this.rotateHypercube('right', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+              });
+            }
 
-          if (x[1] < -0.25) {
-            this.rotateHypercube('up', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
-            });
-          } else if (x[1] > 0.25) {
-            this.rotateHypercube('down', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
-            });
+            if (x[1] < -0.25) {
+              this.rotateHypercube('up', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+              });
+            } else if (x[1] > 0.25) {
+              this.rotateHypercube('down', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+              });
+            }
           }
         });
 
@@ -249,28 +339,32 @@ class Scene {
         // .distinctUntilChanged()
         .filter(x => Math.abs(x[1]) > 0.1)
         .subscribe((x) => {
-          if (x[0] > 0.25) {
-            this.rotateHypercube('left', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
-            });
-          } else if (x[0] < -0.25) {
-            this.rotateHypercube('right', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
-            });
-          }
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
+            if (x[0] > 0.25) {
+              this.rotateHypercube('left', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+              });
+            } else if (x[0] < -0.25) {
+              this.rotateHypercube('right', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+              });
+            }
 
-          if (x[1] < -0.25) {
-            this.rotateHypercube('up', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
-            });
-          } else if (x[1] > 0.25) {
-            this.rotateHypercube('down', 1000, () => {
-              this.cubeRotating = false;
-              (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
-            });
+            if (x[1] < -0.25) {
+              this.rotateHypercube('up', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom > 0) ? this.currentRoom-- : this.currentRoom = this.rooms.length-1;
+              });
+            } else if (x[1] > 0.25) {
+              this.rotateHypercube('down', 1000, () => {
+                this.cubeRotating = false;
+                (this.currentRoom < this.rooms.length-1) ? this.currentRoom++ : this.currentRoom = 0;
+              });
+            }
           }
         });
     }
@@ -331,17 +425,23 @@ class Scene {
     });
   }
 
+  addRoom(roomName) {
+    if (this.room) { this.scene.remove(this.room); }
+    this.room = _.filter(this.rooms, (room) => { return room.name == roomName; })[0].gltf;
+    this.room.scale.set(this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale);
+    this.room.position.copy(this.rooms[this.currentRoom].position.clone());
+    this.scene.add(this.room);
+  }
+
   changeRoom(roomName) {
     if (!this.roomAnimating) {
       this.roomAnimating = true;
-      if (this.room) { this.scene.remove(this.room); }
-      this.room = _.filter(this.rooms, (room) => { return room.name == roomName; })[0].gltf;
-      this.room.scale.set(this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale);
-      this.room.position.copy(this.rooms[this.currentRoom].position.clone());
-      this.scene.add(this.room);
+      this.fadeOverlay('in', 1000, () => {
+        this.addRoom(roomName);
 
-      this.fadeOverlay('out', 2000, () => {
-        this.roomAnimating = false;
+        this.fadeOverlay('out', 2000, () => {
+          this.roomAnimating = false;
+        });
       });
     }
   }

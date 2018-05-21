@@ -29,6 +29,10 @@ const config = {
       src: './src/textures',
       dest: './dist/textures',
     },
+    bmfonts: {
+      src: './src/bmfont',
+      dest: './dist/bmfont',
+    },
   },
 };
 
