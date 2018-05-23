@@ -20,6 +20,7 @@ class Hypercube {
       color: 0xFFFFFF,
       transparent: true,
       opacity: 0.6,
+      linewidth: 2,
     });
 
     this.hypercubeData = this.hypercubeMeshGemometry(1);

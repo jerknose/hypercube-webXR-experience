@@ -17,6 +17,9 @@ import Hypercube from './hypercube';
 import loadFont from 'load-bmfont';
 import PanelGroup from './PanelGroup';
 
+import KinectTransport from '../inputs/KinectTransport';
+import DepthDisplay from './displayComponents/DepthDisplay';
+
 class Scene {
   constructor() {
     window._scene = this;
@@ -156,6 +159,7 @@ class Scene {
     this.initVR();
 
     this.initOverlay();
+    this.initKinectTransport();
 
     if (config.debug) {
       this.stats = new Stats();
@@ -165,6 +169,48 @@ class Scene {
     this.addEventListeners();
     this.animate();
   }
+
+  initKinectTransport() {
+    // this.inputManager.registerCallback('kinecttransport', 'depth', 'Kinect Depth', this.scene.viewKinectTransportDepth.bind(this.scene));
+    // this.inputManager.registerCallback('kinecttransport', 'bodies', 'Kinect Body', this.scene.viewKinectTransportBodies.bind(this.scene));
+    this.kinectTransport = new KinectTransport();
+    this.kinectTransport.on('Buffer', this.viewKinectTransportDepth.bind(this), 'depth', 'kinect depth');
+  }
+
+  viewKinectTransportDepth(buffer) {
+    const imgWidth = 512; const imgHeight = 424; // width and hight of kinect depth camera
+
+    if (!this.kinectPC) { // create point cloud depth display if one doesn't exist
+      const dimensions = {
+        width: imgWidth, height: imgHeight, near: 0, far: 255,
+      };
+      this.kinectGroup = new THREE.Object3D();
+      // this.kinectGroup.scale.set(0.01, 0.01, 0.01);
+      this.scene.add(this.kinectGroup);
+      this.kinectPC = new DepthDisplay(this.kinectGroup, dimensions, 30, false);
+    }
+
+    // this.kinectPC.moveSlice();
+    this.kinectPC.updateDepth('kinecttransport', buffer.data);
+    this.kinectPC.updateColor('kinecttransport', buffer.data);
+  }
+
+  // viewKinectTransportBodies(bodiesObj) {
+  //   // console.log(bodiesObj.bodies.trackingIds.length);
+  //   const bodies = bodiesObj.bodies.bodies;
+  //   if (!this.bodies) {
+  //     this.bodies = {};
+  //   }
+
+  //   _.each(bodies, (body, idx) => {
+  //     // body.id;
+  //     if (!this.bodies[idx]) {
+  //       this.bodies[idx] = new Performer(this.sceneGroup, idx);
+  //     }
+
+  //     this.bodies[idx].updateJoints(body.joints);
+  //   });
+  // }
 
   initPanelGroup() {
     

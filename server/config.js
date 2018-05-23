@@ -8,6 +8,14 @@ const config = {
     port: 8080,
   },
   favicon: __dirname + './../dist/images/favicon.ico',
+  // input sockets
+  kinectTransport: {
+    enabled: true,
+    ports: {
+      incoming: 3000,
+      outgoing: 9999,
+    },
+  },
   copy: {
     html: {
       src: './src/html/index.html',

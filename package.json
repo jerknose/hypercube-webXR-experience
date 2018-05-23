@@ -7,8 +7,9 @@
     "webpack": "webpack-dev-server --history-api-fallback  --watch-poll --progress --colors",
     "build": "webpack --config webpack-production.config.js --progress --profile --colors",
     "file": "node ./server/fileServer.js",
-    "start": "npm run file",
-    "dev": "npm run webpack"
+    "data": "node ./server/dataServer.js",
+    "start": "npm run file | npm run data",
+    "dev": "npm run webpack | npm run data"
   },
   "repository": {
     "type": "git",
