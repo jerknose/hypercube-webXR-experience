@@ -14,19 +14,17 @@ class DepthDisplay {
 
     this.sliceStart = 0;
     this.sliceDepth = 10;
+    this.size = 0.01;
 
     this.pc = null;
     this.buildPC(this.dimensions.width * this.dimensions.height);
 
-    var center = new THREE.Vector3(0, 1, 0);
+    let center = new THREE.Vector3(0, 1, 0);
 
     this.pc.position.set( center.x, center.y, center.z );
-    this.pc.geometry.applyMatrix(new THREE.Matrix4().makeTranslation( -center.x, -center.y, -center.z ) );
-    this.pc.rotation.x = 0;
-    this.pc.rotation.y = 0;
-    this.pc.scale.set(0.1, 0.1, 0.1);
+    this.pc.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
 
-    var bbox = new THREE.BoundingBoxHelper( this.pc, 0x00FF00 );
+    let bbox = new THREE.BoundingBoxHelper( this.pc, 0x00FF00 );
     bbox.update();
     this.parent.add(bbox);
   }
@@ -50,7 +48,7 @@ class DepthDisplay {
         }
       }
 
-      this.sizes[this.idx] = 0.01;
+      this.sizes[this.idx] = this.size;
 
       this.idx++;
       // // positions
@@ -71,10 +69,21 @@ class DepthDisplay {
     this.geometry.addAttribute('size', new THREE.BufferAttribute(this.sizes, 1));
     this.geometry.computeBoundingSphere();
 
-    this.material = new THREE.PointsMaterial({ vertexColors: THREE.VertexColors });
+    // Pointcloud sprite shader
+    let material = new THREE.ShaderMaterial( {
+      transparent: true,
+      depthTest: false,
+      uniforms: {
+        color:   { value: new THREE.Color(0xFFFFFF) },
+        texture: { value: textureLoader.load('textures/sprites/disc.png') }
+      },
+      vertexShader: require('./glsl/vertex.glsl'),
+      fragmentShader: require('./glsl/fragment.glsl')
+    } );
     this.pc = new THREE.Points(this.geometry, this.material);
 
     this.parent.add(this.pc);
+
     this.pc.rotateZ(Math.PI);
     this.pc.rotateX(-Math.PI / 2);
     this.pc.position.x = (this.dimensions.width / 20) / 2;
