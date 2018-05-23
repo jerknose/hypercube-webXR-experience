@@ -14,7 +14,7 @@ class DepthDisplay {
 
     this.sliceStart = 0;
     this.sliceDepth = 10;
-    this.size = 0.01;
+    this.size = 0.005;
 
     this.pc = null;
     this.buildPC(this.dimensions.width * this.dimensions.height);
@@ -24,9 +24,9 @@ class DepthDisplay {
     this.pc.position.set( center.x, center.y, center.z );
     this.pc.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
 
-    let bbox = new THREE.BoundingBoxHelper( this.pc, 0x00FF00 );
-    bbox.update();
-    this.parent.add(bbox);
+    // let bbox = new THREE.BoundingBoxHelper( this.pc, 0x00FF00 );
+    // bbox.update();
+    // this.parent.add(bbox);
   }
 
   buildPC(particles) {
@@ -84,8 +84,10 @@ class DepthDisplay {
 
     this.parent.add(this.pc);
 
-    this.pc.rotateZ(Math.PI);
-    this.pc.rotateX(-Math.PI / 2);
+    this.pc.rotation.x = Math.PI;
+    this.pc.rotation.y = Math.PI;
+    this.pc.rotation.z = 0;
+
     this.pc.position.x = (this.dimensions.width / 20) / 2;
     this.pc.position.y = (this.dimensions.height / 10);
   }
@@ -198,10 +200,11 @@ class DepthDisplay {
     this.pc.geometry.attributes.color.needsUpdate = true;
   }
 
-  mapRange(num, oldMinValue, oldMaxValue, newMinValue, newMaxValue) {
-    const a = oldMaxValue - oldMinValue;
-    const b = newMaxValue - newMinValue;
-    return (num - oldMinValue) / a * b + newMinValue;
+  mapRange(inVal, inMin, inMax, outMin, outMax) {
+    let a = inMax - inMin;
+    let b = outMax - outMin;
+    let outVal = (inVal - inMin) / a * b + outMin;
+    return outVal;
   }
 }
 

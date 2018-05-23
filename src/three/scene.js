@@ -137,7 +137,7 @@ class Scene {
       this.scene.add(new THREE.AxisHelper(5));
     }
 
-    this.camera = new THREE.PerspectiveCamera(20, this.w / this.h, 0.001, 1000000);
+    this.camera = new THREE.PerspectiveCamera(20, this.w / this.h, 1/1000, 1000);
     window.camera = this.camera;
 
     this.camera.position.set(0, 1, 0);
@@ -182,7 +182,7 @@ class Scene {
 
     if (!this.kinectPC) { // create point cloud depth display if one doesn't exist
       const dimensions = {
-        width: imgWidth, height: imgHeight, near: 0, far: 255,
+        width: imgWidth, height: imgHeight, near: 0, far: 128,
       };
       this.kinectGroup = new THREE.Object3D();
       // this.kinectGroup.scale.set(0.01, 0.01, 0.01);
