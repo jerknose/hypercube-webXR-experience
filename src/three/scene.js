@@ -50,8 +50,9 @@ class Scene {
     this.gltfReady = false;
     this.fontsReady = false;
     this.waitingRoom = true;
+    this.lastRoom = null;
 
-    let assetCheck = 1;
+    let assetCheck = 0;
     this.rooms.forEach((room) => {
       this.loadRoom(room.name, (gltf) => {
         assetCheck++;
@@ -86,15 +87,17 @@ class Scene {
 
   startExperience() {
     this.waitingRoom = false;
-    this.pg.destroyPanels();
+    if (this.pg) { this.pg.destroyPanels(); }
     this.fadeOverlay('out', 2000, () => {});
   }
 
   showReadyMessage(gltf, fonts) {
+    console.log(gltf, fonts);
     if (gltf && fonts) {
-      this.initPanelGroup();
+      this.initStartPanelGroup();
     }
   }
+
   loadFonts(fontList) {
     _.each(fontList, (fontDef) => {
         loadFont(fontDef.json, (err, font) => {
@@ -154,7 +157,6 @@ class Scene {
     this.container.append(this.renderer.domElement);
 
     this.addHypercube();
-    // this.changeRoom(this.rooms[this.currentRoom].name);
 
     this.initVR();
 
@@ -177,17 +179,20 @@ class Scene {
     this.kinectTransport.on('Buffer', this.viewKinectTransportDepth.bind(this), 'depth', 'kinect depth');
   }
 
-  viewKinectTransportDepth(buffer) {
+  initDepthDisplay() {
     const imgWidth = 512; const imgHeight = 424; // width and hight of kinect depth camera
-
+    const dimensions = {
+      width: imgWidth, height: imgHeight, near: 0, far: 128,
+    };
+    this.kinectGroup = new THREE.Object3D();
+    this.kinectGroup.scale.set(0.05, 0.05, 0.05);
+    this.kinectGroup.position.set(0.6, 1, -2);
+    this.scene.add(this.kinectGroup);
+    this.kinectPC = new DepthDisplay(this.kinectGroup, dimensions, 30, false);
+  }
+  viewKinectTransportDepth(buffer) {
     if (!this.kinectPC) { // create point cloud depth display if one doesn't exist
-      const dimensions = {
-        width: imgWidth, height: imgHeight, near: 0, far: 128,
-      };
-      this.kinectGroup = new THREE.Object3D();
-      // this.kinectGroup.scale.set(0.01, 0.01, 0.01);
-      this.scene.add(this.kinectGroup);
-      this.kinectPC = new DepthDisplay(this.kinectGroup, dimensions, 30, false);
+      this.initDepthDisplay();
     }
 
     // this.kinectPC.moveSlice();
@@ -212,14 +217,23 @@ class Scene {
   //   });
   // }
 
-  initPanelGroup() {
-    
+  initStartPanelGroup() {
     this.pg = new PanelGroup();
     this.pg.drawPanels({}, window.fonts);
     this.panelsGroup = this.pg.getPanelsGroup();
     this.panelsGroup.position.y = 1;
     this.panelsGroup.position.z = -0.75;
     this.scene.add(this.panelsGroup);
+
+    let geometry = new THREE.PlaneBufferGeometry(1, 1, 1);
+    let material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      map: new THREE.TextureLoader().load('textures/instructions.png'),
+    });
+    let plane = new THREE.Mesh(geometry, material);
+    plane.position.y = 0.25;
+    // plane.position.z = -0.25;
+    this.panelsGroup.add(plane);
   }
 
   initOverlay() {
@@ -477,10 +491,11 @@ class Scene {
     this.room.scale.set(this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale, this.rooms[this.currentRoom].scale);
     this.room.position.copy(this.rooms[this.currentRoom].position.clone());
     this.scene.add(this.room);
+    this.lastRoom = roomName;
   }
 
   changeRoom(roomName) {
-    if (!this.roomAnimating) {
+    if (this.lastRoom !== roomName && !this.roomAnimating) {
       this.roomAnimating = true;
       this.fadeOverlay('in', 1000, () => {
         this.addRoom(roomName);
@@ -489,6 +504,7 @@ class Scene {
           this.roomAnimating = false;
         });
       });
+      this.lastRoom = roomName;
     }
   }
 
