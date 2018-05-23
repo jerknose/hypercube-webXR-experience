@@ -75,7 +75,7 @@ class DepthDisplay {
       depthTest: false,
       uniforms: {
         color:   { value: new THREE.Color(0xFFFFFF) },
-        texture: { value: textureLoader.load('textures/sprites/disc.png') }
+        texture: { value: new THREE.TextureLoader().load('textures/sprites/disc.png') }
       },
       vertexShader: require('./glsl/vertex.glsl'),
       fragmentShader: require('./glsl/fragment.glsl')
@@ -198,11 +198,14 @@ class DepthDisplay {
     this.pc.geometry.attributes.color.needsUpdate = true;
   }
 
-  mapRange(num, oldMinValue, oldMaxValue, newMinValue, newMaxValue) {
-    const a = oldMaxValue - oldMinValue;
-    const b = newMaxValue - newMinValue;
-    return (num - oldMinValue) / a * b + newMinValue;
-  }
+  mapRange (inVal, inMin, inMax, outMin, outMax) {
+		let a = inMax - inMin;
+		let b = outMax - outMin;
+    let outVal = (inVal - inMin) / a * b + outMin;
+    outVal = outVal > outMax ? outMax : outVal
+    outVal = outVal < outMin ? outMin : outVal
+    return outVal
+	}
 }
 
 module.exports = DepthDisplay;
