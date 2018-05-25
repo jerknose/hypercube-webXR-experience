@@ -1,5 +1,7 @@
 class Hypercube {
-  constructor() {
+  constructor(active) {
+    this.active = active;
+
     this.hypercube = new THREE.Object3D();
     this.hypercubeData = null;
     this.cubeShadowGeometry = null;
@@ -35,7 +37,7 @@ class Hypercube {
     const line = new THREE.LineSegments(this.shadowBuffer, lineMaterial);
     this.hypercube.add(line);
 
-    const hypermaterial = new THREE.MeshBasicMaterial({
+    this.hypermaterial = new THREE.MeshBasicMaterial({
       color: 0x000000,
       opacity: 0.5,
       transparent: true,
@@ -44,7 +46,7 @@ class Hypercube {
     });
 
     const meshBuffer = new THREE.BufferGeometry();
-    const shadowMesh = new THREE.Mesh(this.cubeShadowGeometry, hypermaterial);
+    const shadowMesh = new THREE.Mesh(this.cubeShadowGeometry, this.hypermaterial);
 
     this.hypercube.add(shadowMesh);
   }
@@ -201,13 +203,15 @@ class Hypercube {
   }
 
   update(timestamp) {
-    const deltaTime = (timestamp - this.lastTime);
+    if (this.active) {
+      const deltaTime = (timestamp - this.lastTime);
 
-    this.hypercubeData.applyMatrix(this.rotateXYMatrix4(0.001 * deltaTime));
-    this.project3DShadow(this.hypercubeData, this.cubeShadowGeometry);
-    this.shadowBuffer.updateFromObject(this.shadowVerts);
+      this.hypercubeData.applyMatrix(this.rotateXYMatrix4(0.001 * deltaTime));
+      this.project3DShadow(this.hypercubeData, this.cubeShadowGeometry);
+      this.shadowBuffer.updateFromObject(this.shadowVerts);
 
-    this.lastTime = timestamp;
+      this.lastTime = timestamp;
+    }
   }
 }
 

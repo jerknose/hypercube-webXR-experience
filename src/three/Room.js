@@ -37,37 +37,38 @@ class Room {
               }
             }
           });
-          // setTimeout(() => {
-            this.environment.visible = this.enabled;
-          // }, 5000);
+          this.environment.visible = this.enabled;
         });
         break;
     }
     
     this.objects = [];
     this.objectGroup = new THREE.Object3D();
-    this.objectGroup.position.copy(new THREE.Vector3(0, 1, -2)); 
     this.parent.add(this.objectGroup);
 
-    let x = -1;
-    _.each(this.props.objects, (obj) => {
-      switch (obj.type) {
+    _.each(this.props.objects, (objProps) => {
+      switch (objProps.type) {
         default:
+          return false;
           break;
         case 'cube':
-          this.addHypercube(x);
+          this.addHypercube(objProps);
           break;
       }
-      x+=1;
     });
   }
 
-  addHypercube(x) { // Add assets to scene
-    let hc = new Hypercube(this.parent);
+  addHypercube(props) { // Add assets to scene
+    let hc = new Hypercube(props.active);
     this.objects.push(hc);
+
     let hypercube = hc.getHypercube();
     hypercube.scale.set(0.5, 0.5, 0.5);
-    hypercube.position.set(x, 0, 0);
+    
+    hypercube.position.copy(props.position.clone());
+    hypercube.rotation.copy(props.rotation.clone());
+
+    hypercube.visible = this.enabled;
 
     this.objectGroup.add(hypercube);
   }
@@ -98,6 +99,7 @@ class Room {
 
     environment.scale.set(this.props.scale, this.props.scale, this.props.scale);
     environment.position.copy(this.props.position.clone());
+    environment.rotation.copy(this.props.rotation.clone());
 
     this.parent.add(environment);
 
@@ -115,7 +117,7 @@ class Room {
     this.gridHelperBottom = new THREE.PolarGridHelper( 8, 16, 8, 64, 0x404040, 0x404040);
     this.parent.add(this.gridHelperBottom);
   }
-  
+
   toggleColor() {
     if (!this.color) {
       this.colorRoom();
@@ -150,6 +152,9 @@ class Room {
     if (this.environment) {
       this.environment.visible = true;
     }
+    _.each(this.objectGroup.children, (obj) => {
+      obj.visible = true;
+    });
     this.enabled = true;
   }
 
@@ -157,6 +162,9 @@ class Room {
     if (this.environment) {
       this.environment.visible = false;
     }
+    _.each(this.objectGroup.children, (obj) => {
+      obj.visible = false;
+    });
     this.enabled = false;
   }
 

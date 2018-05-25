@@ -152,12 +152,14 @@ class Scene {
   }
 
   changeRoom(id) {
+    this.currentRoom.disable();
+
     let newRoom = _.filter(this.rooms, (room) => {
       return room.id == id;
     })[0];
-    this.currentRoom.disable();
+    newRoom.enable();
+
     this.currentRoom = newRoom;
-    this.currentRoom.enable();
   }
 
   toggleRoomColor() {
