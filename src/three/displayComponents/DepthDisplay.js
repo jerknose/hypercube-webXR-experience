@@ -35,7 +35,7 @@ class DepthDisplay {
     this.positions = new Float32Array(this.particles * 3);
     this.colors = new Float32Array(this.particles * 3);
     this.sizes = new Float32Array(this.particles);
-    this.color = new THREE.Color();
+    this.color = new THREE.Color(0xFFFFFF);
 
     this.idx = 0;
     this.y = 0;
@@ -58,11 +58,9 @@ class DepthDisplay {
       this.positions[i] = x / 20;
       this.positions[i + 1] = y / 20;
       this.positions[i + 2] = z;
+
       // colors
-      this.color.setRGB(255, 255, 255);
-      this.colors[i] = this.color.r;
-      this.colors[i + 1] = this.color.g;
-      this.colors[i + 2] = this.color.b;
+      this.color.toArray(this.colors, i * 3);
     }
     this.geometry.addAttribute('position', new THREE.BufferAttribute(this.positions, 3));
     this.geometry.addAttribute('color', new THREE.BufferAttribute(this.colors, 3));

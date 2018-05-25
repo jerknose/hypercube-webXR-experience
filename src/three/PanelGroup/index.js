@@ -12,12 +12,6 @@ class PanelGroup {
     this.isOpen = false;
     this.tweenCount = 0;
 
-    this.bgPadding = [5, 2.5, 1.25, 2.5]; // top, right, bottom, left
-    this.bgCornerRadius = [0, 0, 0, 0]; // top-left, top-right, bottom-right, bottom-left
-    this.bgOpacity = 0.3;
-    this.bgThickness = 0.01;
-    this.bgColor = 0x002947;
-
     this.chartColors = {
       doc: 0x0061D5,
       excel: 0x5FC9CF,
@@ -62,32 +56,13 @@ class PanelGroup {
     this.panel = new Panel();
   }
 
-  drawPanels(data, fonts) {
+  drawPanels(content, panel, fonts) {
     this.destroyPanels();
     if (this.panel !== null && fonts !== undefined && _.filter(fonts, { name: 'regular' })[0] !== undefined) {
       this.panels = [
         this.panel.drawPanel(
-          [
-            {
-              type: 'text',
-              value: 'Press Any Button to Start',
-              style: this.styles.p,
-              align: 'center',
-              padding: [0, 0, 0, 0], // top, right, bottom, left
-            },
-          ],
-          {
-            width: 'auto', // 0 or 'auto' for auto width, number for fixed width
-            thickness: this.bgThickness,
-            opacity: 0, // this.bgOpacity,
-            padding: this.bgPadding,
-            cornerRadius: this.bgCornerRadius,
-            color: this.bgColor,
-            position: new THREE.Vector3(0, 0, 0),
-            align: ['top', 'center'], // 'top' or 'bottom', 'left' or 'center' or 'right'
-            fonts: fonts,
-            layerSeparation: this.layerSeparation,
-          },
+          content,
+          panel
         ),
       ];
 
