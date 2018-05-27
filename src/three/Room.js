@@ -1,5 +1,5 @@
 import Utils from '../utils';
-import Hypercube from './hypercube';
+import InteractiveObject from './displayComponents/InteractiveObject';
 
 class Room {
   constructor(parent, props) {
@@ -15,8 +15,11 @@ class Room {
 
     this.environment = null;
 
-    this.hypercube = null;
+    this.initEnvironment();
+    this.initInteractiveObjects();
+  }
 
+  initEnvironment() {
     switch (this.type) {
       case 'empty':
         this.addEmptyEnvironment();
@@ -26,51 +29,19 @@ class Room {
           this.bwTexture = new THREE.TextureLoader().load(this.props.bwURL, (a) => {});
         }
 
-        this.loadGltfEnvironment(this.props.colorURL, (environment) => {
-          this.environment = environment;
-          this.environment.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-              this.colorTexture = _.cloneDeep(child.material.map);
-              this.cloneTextureAttributes();
-              if (!this.colored) {
-                setTimeout(this.bwRoom.bind(this), 25);
-              }
-            }
-          });
-          this.environment.visible = this.enabled;
-        });
+        this.loadGltfEnvironment(this.props.colorURL);
         break;
     }
-    
-    this.objects = [];
+  }
+
+  initInteractiveObjects() {
+    this.interactiveObjects = [];
     this.objectGroup = new THREE.Object3D();
     this.parent.add(this.objectGroup);
 
     _.each(this.props.objects, (objProps) => {
-      switch (objProps.type) {
-        default:
-          return false;
-          break;
-        case 'cube':
-          this.addHypercube(objProps);
-          break;
-      }
+      this.interactiveObjects.push(new InteractiveObject(this.objectGroup, objProps, this.enabled));
     });
-  }
-
-  addHypercube(props) { // Add assets to scene
-    let hc = new Hypercube(props.active);
-    this.objects.push(hc);
-
-    let hypercube = hc.getHypercube();
-    hypercube.scale.set(0.5, 0.5, 0.5);
-    
-    hypercube.position.copy(props.position.clone());
-    hypercube.rotation.copy(props.rotation.clone());
-
-    hypercube.visible = this.enabled;
-
-    this.objectGroup.add(hypercube);
   }
 
   cloneTextureAttributes() {
@@ -81,10 +52,10 @@ class Room {
     this.bwTexture.encoding = this.colorTexture.encoding;
   }
 
-  loadGltfEnvironment(url, callback) {
+  loadGltfEnvironment(url) {
     if (url && url !== '') {
       this.utils.loadGLTF(url, (gltf) => {
-        this.addGltfEnvironment(gltf.scene, callback);
+        this.addGltfEnvironment(gltf.scene);
       });
     }
   }
@@ -95,15 +66,25 @@ class Room {
 
   addGltfEnvironment(scene, callback) {
     if (scene) { this.removeGltfEnvironment(); }
-    let environment = scene;
+    this.environment = scene;
+    console.log(this.environment);
 
-    environment.scale.set(this.props.scale, this.props.scale, this.props.scale);
-    environment.position.copy(this.props.position.clone());
-    environment.rotation.copy(this.props.rotation.clone());
+    this.environment.scale.set(this.props.scale, this.props.scale, this.props.scale);
+    this.environment.position.copy(this.props.position.clone());
+    this.environment.rotation.copy(this.props.rotation.clone());
 
-    this.parent.add(environment);
+    this.parent.add(this.environment);
 
-    callback(environment);
+    this.environment.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        this.colorTexture = _.cloneDeep(child.material.map);
+        this.cloneTextureAttributes();
+        if (!this.colored) {
+          setTimeout(this.bwRoom.bind(this), 25);
+        }
+      }
+    });
+    // this.environment.visible = this.enabled;
   }
 
   removeEmptyEnvironment() {
@@ -152,8 +133,8 @@ class Room {
     if (this.environment) {
       this.environment.visible = true;
     }
-    _.each(this.objectGroup.children, (obj) => {
-      obj.visible = true;
+    _.each(this.interactiveObjects, (obj) => {
+      obj.show();
     });
     this.enabled = true;
   }
@@ -162,15 +143,15 @@ class Room {
     if (this.environment) {
       this.environment.visible = false;
     }
-    _.each(this.objectGroup.children, (obj) => {
-      obj.visible = false;
+    _.each(this.interactiveObjects, (obj) => {
+      obj.hide();
     });
     this.enabled = false;
   }
 
   update() {
-    if (this.objects.length > 0) {
-      _.each(this.objects, (obj) => {
+    if (this.interactiveObjects.length > 0) {
+      _.each(this.interactiveObjects, (obj) => {
         obj.update(window.performance.now());
       });
     }

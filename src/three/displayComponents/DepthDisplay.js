@@ -75,8 +75,8 @@ class DepthDisplay {
         color:   { value: new THREE.Color(0xFFFFFF) },
         texture: { value: new THREE.TextureLoader().load('textures/sprites/disc.png') }
       },
-      vertexShader: require('./glsl/vertex.glsl'),
-      fragmentShader: require('./glsl/fragment.glsl')
+      vertexShader: require('./glsl/kinect_vertex.glsl'),
+      fragmentShader: require('./glsl/kinect_fragment.glsl')
     } );
     this.pc = new THREE.Points(this.geometry, this.material);
 
