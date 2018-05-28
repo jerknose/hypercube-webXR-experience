@@ -33,6 +33,15 @@ class VR {
     this.intersected = [];
     this.tempMatrix = new THREE.Matrix4();
 
+    let lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)]);
+    let lineMat = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      linewidth: 1,
+    });
+    this.line = new THREE.Line(lineGeo, lineMat);
+    this.line.name = 'line';
+    this.line.scale.z = 5;
+
     this.group;
 
     this.events = [];
@@ -61,6 +70,7 @@ class VR {
 
   initStreams() {
     // right
+    this.rightIntersectStream = new Rx.Subject()
     this.rightControllerPoseStream = new Rx.Subject()
     this.rightGripStream = new Rx.Subject()
     this.rightTriggerStream = new Rx.Subject()
@@ -69,6 +79,7 @@ class VR {
     this.rightStickStream = new Rx.Subject()
 
     // left
+    this.leftIntersectStream = new Rx.Subject()
     this.leftControllerPoseStream = new Rx.Subject()
     this.leftGripStream = new Rx.Subject()
     this.leftTriggerStream = new Rx.Subject()
@@ -191,7 +202,7 @@ class VR {
     this.parent.add(this.controllers[idx]);
 
     this.getViveControllerModel((object) => {
-      console.log('Vive Controller Model :', object);
+      // console.log('Vive Controller Model :', object);
       this.controllers[idx].add(object.clone());
     });
   }
@@ -199,28 +210,40 @@ class VR {
   initRiftController(name, idx) {
     // controllers
 
-    this.controllers[idx] = new THREE.RiftController(idx);
-    this.controllers[idx].name = this.controllerNames[idx];
+    if (!this.controllers[idx]) {
+      this.controllers[idx] = new THREE.RiftController(idx);
+      this.controllers[idx].name = this.controllerNames[idx];
 
-    this.controllers[idx].standingMatrix = this.vrControls.getStandingMatrix();
+      this.controllers[idx].standingMatrix = this.vrControls.getStandingMatrix();
 
-    this.parent.add(this.controllers[idx]);
+      this.parent.add(this.controllers[idx]);
 
-    let hand = 'right';
-    if (name.toLowerCase().search('left') !== -1) {
-      hand = 'left';
+      let hand = 'right';
+      if (name.toLowerCase().search('left') !== -1) {
+        hand = 'left';
+      }
+      if (name.toLowerCase().search('right') !== -1) {
+        hand = 'right';
+      }
+
+      this.getRiftControllerModel(hand, (object, type) => {
+        // console.log('Rift Controller Model :', object);
+        object.rotation.x = (Math.PI / 4);
+        object.position.y += 0.075;
+        object.position.x += (type === 'left') ? -0.0125 : 0.0125;
+        this.controllers[idx].add(object.clone());
+
+        let line = this.line.clone()
+        // line.rotation.set(0.099, 0.019, 0);
+        // line.position.set(0.0125, 0.024, 0);
+        // line.position.x = (type === 'left') ? -0.0075 : 0.0025;
+        // line.rotation.y = (type === 'left') ? -0.061 : 0.019;
+        this.controllers[idx].add(line);
+
+        // console.log(_.size(this.controllers) + ' controllers');
+        // console.log('with ' + this.controllers[idx].children.length + ' children');
+      });
     }
-    if (name.toLowerCase().search('right') !== -1) {
-      hand = 'right';
-    }
-
-    this.getRiftControllerModel(hand, (object, type) => {
-      console.log('Rift Controller Model :', object);
-      object.rotation.x = (Math.PI / 4);
-      object.position.y += 0.075;
-      object.position.x += (type === 'left') ? -0.0125 : 0.0125;
-      this.controllers[idx].add(object.clone());
-    });
   }
 
   onWindowResize() {
@@ -353,35 +376,59 @@ class VR {
     }
   }
 
-  render(that) {
+  getIntersections(controller, objects) {
+    this.tempMatrix.identity().extractRotation(controller.matrixWorld);
+    this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    this.raycaster.ray.near = 0.5;
+    this.raycaster.ray.far = 5;
+    this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
+    return _.uniq(_.map(this.raycaster.intersectObjects(objects, true), (obj) => { return this.findParent(obj.object); }));
+  }
+
+  findParent(object) {
+    let p = object;
+    let name = null;
+    while (name == null) {
+      p = p.parent;
+      if (p.objName) {
+        name = p.objName;
+      }
+    }
+    return name;
+  }
+
+  render(that, objects) {
     if (_.size(that.controllers) > 0) {
       _.each(that.controllers, (c) => {
         c.update();
-
-        let gamepad = null;
-        if (that.controllers[0]) {
-          gamepad = that.controllers[0].getGamepad();
-          if (gamepad) {
-            that.rightControllerPoseStream.next(gamepad.pose);
-            that.buttonXStream.next(gamepad.buttons[3].pressed);
-            that.buttonYStream.next(gamepad.buttons[4].pressed);
-            that.rightStickStream.next(gamepad.axes);
-
-            that.updateGamepadPose(null, gamepad.pose);
-          }
-        }
-        if (that.controllers[1]) {
-          gamepad = that.controllers[1].getGamepad();
-          if (gamepad) {
-            that.leftControllerPoseStream.next(gamepad.pose);
-            that.buttonAStream.next(gamepad.buttons[3].pressed);
-            that.buttonBStream.next(gamepad.buttons[4].pressed);
-            that.leftStickStream.next(gamepad.axes);
-
-            that.updateGamepadPose(gamepad.pose, null);
-          }
-        }
       });
+
+      let gamepad = null;
+      if (that.controllers[0]) {
+        gamepad = that.controllers[0].getGamepad();
+        if (gamepad) {
+          that.rightIntersectStream.next(that.getIntersections(that.controllers[0], objects));
+          that.rightControllerPoseStream.next(gamepad.pose);
+          that.buttonXStream.next(gamepad.buttons[3].pressed);
+          that.buttonYStream.next(gamepad.buttons[4].pressed);
+          that.rightStickStream.next(gamepad.axes);
+
+          that.updateGamepadPose(null, gamepad.pose);
+        }
+      }
+      if (that.controllers[1]) {
+        // this.getIntersections(that.controllers[1], objects);
+        gamepad = that.controllers[1].getGamepad();
+        if (gamepad) {
+          that.leftIntersectStream.next(that.getIntersections(that.controllers[1], objects));
+          that.leftControllerPoseStream.next(gamepad.pose);
+          that.buttonAStream.next(gamepad.buttons[3].pressed);
+          that.buttonBStream.next(gamepad.buttons[4].pressed);
+          that.leftStickStream.next(gamepad.axes);
+
+          that.updateGamepadPose(gamepad.pose, null);
+        }
+      }
     }
 
     if (that.vrControls) {

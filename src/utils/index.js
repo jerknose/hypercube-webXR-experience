@@ -13,6 +13,7 @@ class Utils {
                 fontDef.font = font;
                 fontDef.texture = texture;
                 if (_.filter(fontList, 'font').length === fontList.length) {
+                    window.fontsReady = true;
                     callback(true);
                 }
             });

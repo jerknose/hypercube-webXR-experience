@@ -1,6 +1,8 @@
 import Utils from '../utils';
 import InteractiveObject from './displayComponents/InteractiveObject';
 
+import PanelGroup from './PanelGroup';
+
 class Room {
   constructor(parent, props) {
     this.parent = parent;
@@ -15,8 +17,13 @@ class Room {
 
     this.environment = null;
 
+    this.poemPanelsGroup = null;
+
     this.initEnvironment();
     this.initInteractiveObjects();
+    if (window.fontsReady) {
+      this.initPoemPanelGroup();
+    }
   }
 
   initEnvironment() {
@@ -25,11 +32,11 @@ class Room {
         this.addEmptyEnvironment();
         break;
       case 'gltf':
-        if (this.props.bwURL && this.props.bwURL !== '') {
-          this.bwTexture = new THREE.TextureLoader().load(this.props.bwURL, (a) => {});
+        if (this.props.colorURL && this.props.colorURL !== '') {
+          this.colorTexture = new THREE.TextureLoader().load(this.props.colorURL, (a) => {});
         }
 
-        this.loadGltfEnvironment(this.props.colorURL);
+        this.loadGltfEnvironment(this.props.bwURL);
         break;
     }
   }
@@ -37,6 +44,7 @@ class Room {
   initInteractiveObjects() {
     this.interactiveObjects = [];
     this.objectGroup = new THREE.Object3D();
+    this.objectGroup.name = 'Room ' + this.props.id + ' Interacive Objects';
     this.parent.add(this.objectGroup);
 
     _.each(this.props.objects, (objProps) => {
@@ -45,11 +53,11 @@ class Room {
   }
 
   cloneTextureAttributes() {
-    this.bwTexture.wrapS = this.colorTexture.wrapS;
-    this.bwTexture.wrapT = this.colorTexture.wrapT;
-    this.bwTexture.format = this.colorTexture.format;
-    this.bwTexture.flipY = this.colorTexture.flipY;
-    this.bwTexture.encoding = this.colorTexture.encoding;
+    this.colorTexture.wrapS = this.bwTexture.wrapS;
+    this.colorTexture.wrapT = this.bwTexture.wrapT;
+    this.colorTexture.format = this.bwTexture.format;
+    this.colorTexture.flipY = this.bwTexture.flipY;
+    this.colorTexture.encoding = this.bwTexture.encoding;
   }
 
   loadGltfEnvironment(url) {
@@ -67,7 +75,7 @@ class Room {
   addGltfEnvironment(scene, callback) {
     if (scene) { this.removeGltfEnvironment(); }
     this.environment = scene;
-    console.log(this.environment);
+    this.environment.name = 'Room ' + this.props.id;
 
     this.environment.scale.set(this.props.scale, this.props.scale, this.props.scale);
     this.environment.position.copy(this.props.position.clone());
@@ -77,10 +85,10 @@ class Room {
 
     this.environment.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        this.colorTexture = _.cloneDeep(child.material.map);
+        this.bwTexture = _.cloneDeep(child.material.map);
         this.cloneTextureAttributes();
-        if (!this.colored) {
-          setTimeout(this.bwRoom.bind(this), 25);
+        if (this.colored) {
+          setTimeout(this.colorRoom.bind(this), 25);
         }
       }
     });
@@ -99,16 +107,104 @@ class Room {
     this.parent.add(this.gridHelperBottom);
   }
 
-  toggleColor() {
-    if (!this.color) {
-      this.colorRoom();
-    } else {
-      this.bwRoom();
+  initPoemPanelGroup() {
+    this.bgPadding = [1.25, 2.5, 1.25, 2.5]; // top, right, bottom, left
+    this.bgCornerRadius = [0, 0, 0, 0]; // top-left, top-right, bottom-right, bottom-left
+    this.bgOpacity = 0.3;
+    this.bgThickness = 0.01;
+    this.bgColor = 0x000000;
+
+    this.startPG = new PanelGroup();
+    this.startPG.drawPanels([
+      {
+        type: 'text',
+        value: this.props.text.content,
+        style: {
+          size: 3, // cap height in cm
+          color: 0xFFFFFF,
+          weight: 'bold', // bold or regular
+        },
+        align: 'center',
+        padding: [0, 0, 0, 0], // top, right, bottom, left
+      },
+    ],
+    {
+      width: this.props.text.width, // 0 or 'auto' for auto width, number for fixed width
+      thickness: this.bgThickness,
+      opacity: 0, // this.bgOpacity,
+      padding: this.bgPadding,
+      cornerRadius: this.bgCornerRadius,
+      color: this.bgColor,
+      position: new THREE.Vector3(0, 0, 0),
+      align: ['top', 'center'], // 'top' or 'bottom', 'left' or 'center' or 'right'
+      fonts: window.fonts,
+      layerSeparation: this.layerSeparation,
+    },
+    window.fonts);
+    this.poemPanelsGroup = this.startPG.getPanelsGroup();
+    this.poemPanelsGroup.position.copy(this.props.text.position.clone());
+    this.poemPanelsGroup.rotation.copy(this.props.text.rotation.clone());
+    this.parent.add(this.poemPanelsGroup);
+  }
+
+  getObj(name) {
+    return _.filter(this.interactiveObjects, (obj) => { return obj.objName === name; })[0];
+  }
+
+  highlightObject(name) {
+    if (name !== '') {
+      this.getObj(name).highlight();
     }
   }
 
-  colorRoom() {
+  lowlightObject(name) {
+    if (name !== '') {
+      this.getObj(name).lowlight();
+    }
+  }
+
+  lowlightObjects() {
+    _.each(this.interactiveObjects, (obj) => { return obj.lowlight(); });
+  }
+
+  selectObject(name) {
+    if (name !== '') {
+      this.getObj(name).select();
+
+      if (name === 'book' && this.poemPanelsGroup !== null) {
+        this.poemPanelsGroup.visible = true;
+      } else if (name === 'book' && window.fontsReady) {
+        this.initPoemPanelGroup();
+      }
+    }
+  }
+
+  deselectObject(name) {
+    if (name !== '') {
+      this.getObj(name).deselect();
+      
+      if (name ==='book' && this.poemPanelsGroup !== null) {
+        this.poemPanelsGroup.visible = false;
+        this.makeColor();
+      }
+    }
+  }
+
+  deselectObjects() {
+    _.each(this.interactiveObjects, (obj) => { obj.deselect(); });
+  }
+
+  toggleColor() {
+    if (!this.colored) {
+      this.makeColor();
+    } else {
+      this.makeBW();
+    }
+  }
+
+  makeColor() {
     if (this.colorTexture) {
+      this.colored = true;
       this.environment.traverse((child) => {
         if (child instanceof THREE.Mesh) {
           child.material.map = this.colorTexture;
@@ -116,10 +212,14 @@ class Room {
         }
       });
     }
+    _.each(this.interactiveObjects, (obj) => {
+      obj.makeColor();
+    });
   }
 
-  bwRoom() {
+  makeBW() {
     if (this.bwTexture) {
+      this.colored = false;
       this.environment.traverse((child) => {
         if (child instanceof THREE.Mesh) {
           child.material.map = this.bwTexture;
@@ -127,6 +227,9 @@ class Room {
         }
       });
     }
+    _.each(this.interactiveObjects, (obj) => {
+      obj.makeBW();
+    });
   }
 
   enable() {

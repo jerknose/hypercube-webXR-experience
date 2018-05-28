@@ -9,11 +9,15 @@ class InteractiveObject {
     this.props = objProps;
     this.parent = parent;
     this.enabled = this.enabled;
+    this.colored = this.props.colored;
+    this.selected = false;
 
-    this.object = new THREE.Object3D();
+    this.bwObject = null;
+    this.colorObject = null;
+    this.object = null;
     this.highObject = null;
 
-    this.name = this.props.type;
+    this.objName = this.props.type;
 
     this.utils = new Utils();
 
@@ -25,13 +29,19 @@ class InteractiveObject {
       case 'kinect':
         this.initKinectTransport(this.props);
         break;
+      case 'book':
       case 'violin':
       case 'mandolin':
       case 'flute':
       case 'sword':
       case 'gun':
       case 'axe':
-        this.loadGltfObject(this.props);
+        if (this.colored && this.props.colorURL && this.props.colorURL !== '') {
+          this.loadGltfObject(this.props.colorURL, this.props);
+        } else {
+          this.loadGltfObject(this.props.bwURL, this.props);
+        }
+        
         break;
       case 'cube':
         this.addHypercube(this.props);
@@ -41,10 +51,10 @@ class InteractiveObject {
 
   addHypercube(props) { // Add assets to scene
     this.hc = new Hypercube(props.active);
-
+    if (!this.object) { this.object = new THREE.Object3D(); }
     this.object.add(this.hc.getHypercube());
-    this.object.name = props.type;
-    this.object.scale.set(props.scale, props.scale, props.scale);
+    this.object.objName = props.type;
+    this.object.scale.copy(props.scale.clone());
 
     this.object.position.copy(props.position.clone());
     this.object.rotation.copy(props.rotation.clone());
@@ -54,22 +64,30 @@ class InteractiveObject {
     this.parent.add(this.object);
   }
 
-  loadGltfObject(props) {
-    if (props.colorURL && props.colorURL !== '') {
-      this.utils.loadGLTF(props.colorURL, (gltf) => {
-        this.addGltfObject(gltf.scene, props);
-      });
-    }
+  loadGltfObject(url, props) {
+    this.utils.loadGLTF(url, (gltf) => {
+      this.addGltfObject(gltf.scene, props);
+    });
   }
 
   addGltfObject(obj, props) {
     // if (scene) { this.removeGltfObject(); }
-    this.object.add(obj);
-    this.object.name = props.type;
+    if (!this.object) { this.object = new THREE.Object3D(); }
+    if (this.colored) {
+      if (!this.colorObject) { this.colorObject = new THREE.Object3D(); }
+      this.colorObject = obj;
+      this.object.add(obj);
+    } else {
+      if (!this.bwObject) { this.bwObject = new THREE.Object3D(); }
+      this.bwObject = obj;
+      this.object.add(obj);
+    }
+    
+    this.object.objName = props.type;
 
     this.object.position.copy(props.position.clone());
     this.object.rotation.copy(props.rotation.clone());
-    this.object.scale.set(props.scale, props.scale, props.scale);
+    this.object.scale.copy(props.scale.clone());
 
     // this.object.visible = this.enabled;
 
@@ -77,9 +95,8 @@ class InteractiveObject {
   }
 
   initKinectTransport(props) {
-    // this.inputManager.registerCallback('kinecttransport', 'depth', 'Kinect Depth', this.scene.viewKinectTransportDepth.bind(this.scene));
-    // this.inputManager.registerCallback('kinecttransport', 'bodies', 'Kinect Body', this.scene.viewKinectTransportBodies.bind(this.scene));
-    this.object.name = props.type;
+    if (!this.object) { this.object = new THREE.Object3D(); }
+    this.object.objName = props.type;
     this.kinectTransport = new KinectTransport();
     this.kinectTransport.on('Buffer', this.viewKinectTransportDepth.bind(this), 'depth', 'kinect depth');
   }
@@ -106,25 +123,9 @@ class InteractiveObject {
     this.kinectPC = new DepthDisplay(this.object, dimensions, 30, false);
   }
 
-  // viewKinectTransportBodies(bodiesObj) {
-  //   // console.log(bodiesObj.bodies.trackingIds.length);
-  //   const bodies = bodiesObj.bodies.bodies;
-  //   if (!this.bodies) {
-  //     this.bodies = {};
-  //   }
-
-  //   _.each(bodies, (body, idx) => {
-  //     // body.id;
-  //     if (!this.bodies[idx]) {
-  //       this.bodies[idx] = new Performer(this.sceneGroup, idx);
-  //     }
-
-  //     this.bodies[idx].updateJoints(body.joints);
-  //   });
-  // }
   highlight() {
     if (!this.highObject) {
-      if (this.object.name == 'cube') {
+      if (this.object.objName == 'cube') {
         let bbox = new THREE.Box3().setFromObject(this.object);
         this.highObject = new THREE.Mesh(
           new THREE.BoxBufferGeometry(bbox.max.y, bbox.max.y, bbox.max.y),
@@ -139,7 +140,7 @@ class InteractiveObject {
         this.highObject = this.object.clone();
       }
 
-      console.log(this.object.name, ': ', this.object.scale);
+      console.log(this.object.objName, ': ', this.object.scale);
 
       // this.highObject.scale.multiplyScalar(this.props.highlightScale);
       this.highObject.scale.copy(this.props.highlightScale.clone());
@@ -169,6 +170,33 @@ class InteractiveObject {
     }
   }
 
+  makeColor() {
+    if (this.props.colorURL && this.props.colorURL !== '') {
+      this.colored = true;
+      if (this.bwObject) {
+        this.bwObject.visible = false;
+      }
+      if (!this.colorObject) {
+        this.loadGltfObject(this.props.colorURL, this.props);
+      } else {
+        this.colorObject.visible = true;
+      }
+    }
+  }
+
+  makeBW() {
+    if (this.props.bwURL && this.props.bwURL !== '') {
+      this.colored = false;
+      if (this.colorObject) {
+        this.colorObject.visible = false;
+      }
+      if (!this.bwObject) {
+        this.loadGltfObject(this.props.bwURL, this.props);
+      } else {
+        this.bwObject.visible = true;
+      }
+    }
+  }
 
   show() {
     this.object.visible = true;
@@ -180,6 +208,62 @@ class InteractiveObject {
       this.highlight.visible = false;
       this.lowlight();
     }
+  }
+
+  select() {
+    this.animatePosition(this.object, this.object.position.clone(), this.props.selectedPosition.clone(), 1000);
+    this.animateRotation(this.object, this.object.rotation.clone(), this.props.selectedRotation.clone(), 1000);
+    this.animateScale(this.object, this.object.scale.clone(), this.props.selectedScale.clone(), 1000);
+    this.selected = true;
+  }
+
+  deselect() {
+    this.animatePosition(this.object, this.object.position.clone(), this.props.position.clone(), 500);
+    this.animateRotation(this.object, this.object.rotation.clone(), this.props.rotation.clone(), 500);
+    this.animateScale(this.object, this.object.scale.clone(), this.props.scale.clone(), 500);
+    this.selected = false;
+  }
+
+  animatePosition(obj, from, to, time) {
+    var tween = new TWEEN.Tween(from)
+        .to(to, time)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(function() {
+            obj.position.set(
+              this.x,
+              this.y,
+              this.z,
+            );
+        })
+        .start();
+  }
+
+  animateRotation(obj, from, to, time) {
+    var tween = new TWEEN.Tween(from)
+        .to(to, time)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(function() {
+            obj.rotation.set(
+              this.x,
+              this.y,
+              this.z,
+            );
+        })
+        .start();
+  }
+
+  animateScale(obj, from, to, time) {
+    var tween = new TWEEN.Tween(from)
+        .to(to, time)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(function() {
+            obj.scale.set(
+              this.x,
+              this.y,
+              this.z,
+            );
+        })
+        .start();
   }
 
   update() {
