@@ -36,11 +36,12 @@ class Scene {
 
     this.stats = null;
 
+    this.ready = false;
     this.currentRoom = 0;
     this.cubeRotating = false;
     this.roomAnimating = false;
     this.gltfReady = false;
-    this.fontsReady = false;
+    window.fontsReady = false;
     this.waitingRoom = true;
     this.lastRoom = null;
 
@@ -71,8 +72,7 @@ class Scene {
 
     this.utils.loadFonts(config.fonts, () => {
       // all fonts are loaded
-      this.fontsReady = true;
-      this.showReadyMessage(this.gltfReady, this.fontsReady);
+      this.showReadyMessage();
     });
   }
 
@@ -82,9 +82,10 @@ class Scene {
     this.fadeOverlay('out', 2000, () => {});
   }
 
-  showReadyMessage(gltf, fonts) {
-    if (gltf && fonts) {
+  showReadyMessage() {
+    if (this.ready && window.fontsReady) {
       this.initStartPanelGroup();
+      this.changeRoom(0);
     }
   }
 
@@ -139,8 +140,7 @@ class Scene {
     
     this.initVR();
 
-    // this.initOverlay();
-    // this.initKinectTransport();
+    this.initOverlay();
 
     if (config.debug) {
       this.stats = new Stats();
@@ -326,7 +326,7 @@ class Scene {
           if (this.selectedLeft.length > 0) {
             this.currentRoom.highlightObject(this.selectedLeft[0]);
           } else {
-            this.currentRoom.lowlightObjects();
+            // this.currentRoom.lowlightObjects();
           }
         });
 
@@ -693,6 +693,11 @@ class Scene {
   }
   
   animate() {
+    if (_.every(this.rooms, (room) => { return (room.ready === true); })) {
+      this.showReadyMessage();
+      this.ready = true;
+    }
+
     if (this.vr && this.vr.vrEffect) {
       this.vr.vrEffect.requestAnimationFrame(this.animate.bind(this));
     } else {

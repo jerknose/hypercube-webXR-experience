@@ -133,7 +133,7 @@ class InteractiveObject {
         );
 
         // this.highObject.position.copy(this.object.position.clone());
-        this.highObject.position.add(this.props.highlightOffset);
+        this.highObject.position.copy(this.props.highlightOffset.clone());
         this.highObject.rotation.copy(this.object.rotation.clone());
         this.highObject.scale.copy(this.object.scale.clone());
       } else {

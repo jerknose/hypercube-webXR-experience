@@ -8,6 +8,10 @@ class Room {
     this.parent = parent;
     this.props = props;
 
+    this.ready = false;
+    this.loadedElements = 0;
+    this.readyElements = this.props.objects.length + 1;
+
     this.utils = new Utils();
 
     this.id = this.props.id;
@@ -49,6 +53,7 @@ class Room {
 
     _.each(this.props.objects, (objProps) => {
       this.interactiveObjects.push(new InteractiveObject(this.objectGroup, objProps, this.enabled));
+      this.loadedElements++;
     });
   }
 
@@ -82,6 +87,7 @@ class Room {
     this.environment.rotation.copy(this.props.rotation.clone());
 
     this.parent.add(this.environment);
+    this.loadedElements++;
 
     this.environment.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -105,6 +111,7 @@ class Room {
     if (this.gridHelperBottom) { this.removeEmptyEnvironment(); }
     this.gridHelperBottom = new THREE.PolarGridHelper( 8, 16, 8, 64, 0x404040, 0x404040);
     this.parent.add(this.gridHelperBottom);
+    this.loadedElements++;
   }
 
   initPoemPanelGroup() {
@@ -145,6 +152,7 @@ class Room {
     this.poemPanelsGroup.position.copy(this.props.text.position.clone());
     this.poemPanelsGroup.rotation.copy(this.props.text.rotation.clone());
     this.parent.add(this.poemPanelsGroup);
+    this.loadedElements++;
   }
 
   getObj(name) {
@@ -253,6 +261,10 @@ class Room {
   }
 
   update() {
+    if (this.loadedElements == this.readyElements && this.ready !== true) {
+      this.ready = true;
+    }
+
     if (this.interactiveObjects.length > 0) {
       _.each(this.interactiveObjects, (obj) => {
         obj.update(window.performance.now());
