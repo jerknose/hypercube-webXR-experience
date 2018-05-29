@@ -177,11 +177,13 @@ class Room {
   lowlightObject(name) {
     if (name !== '') {
       this.getObj(name).lowlight();
+      this.lastHighlight = null;
     }
   }
 
   lowlightObjects() {
     _.each(this.interactiveObjects, (obj) => { return obj.lowlight(); });
+    this.lastHighlight = null;
   }
 
   selectObject(name) {
@@ -206,7 +208,7 @@ class Room {
   deselectObject(name) {
     if (name !== '') {
       this.getObj(name).deselect();
-      
+      this.lastSelect = null;
       if (name ==='book' && this.poemPanelsGroup !== null && this.poemPanelsGroup.visible !== false) {
         this.poemPanelsGroup.visible = false;
         // this.makeColor();
@@ -219,6 +221,7 @@ class Room {
     if (this.poemPanelsGroup !== null && this.poemPanelsGroup.visible !== false) {
       this.poemPanelsGroup.visible = false;
     }
+    this.lastSelect = null;
   }
 
   toggleColor() {

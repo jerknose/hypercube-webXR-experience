@@ -72,7 +72,7 @@ class Scene {
 
     this.utils.loadFonts(config.fonts, () => {
       // all fonts are loaded
-      // this.showReadyMessage();
+      this.showReadyMessage(true, this.ready);
     });
   }
 
@@ -82,11 +82,10 @@ class Scene {
     this.fadeOverlay('out', 2000, () => {});
   }
 
-  showReadyMessage() {
-    if (!this.ready) {
+  showReadyMessage(fontsReady, assetsReady) {
+    if (fontsReady && assetsReady) {
       this.initStartPanelGroup();
       this.changeRoom(0);
-      this.ready = true;;
     }
   }
 
@@ -694,8 +693,9 @@ class Scene {
   }
   
   animate() {
-    if (_.every(this.rooms, (room) => { return (room.ready === true); })) {
-      this.showReadyMessage();
+    if (_.every(this.rooms, (room) => { return (room.ready === true); }) && this.ready !== true) {
+      this.showReadyMessage(window.fontsReady, true);
+      this.ready = true;
     }
 
     if (this.vr && this.vr.vrEffect) {

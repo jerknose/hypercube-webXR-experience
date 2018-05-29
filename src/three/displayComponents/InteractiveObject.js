@@ -11,6 +11,8 @@ class InteractiveObject {
     this.enabled = this.enabled;
     this.colored = this.props.colored;
     
+    this.interactive = this.props.interactive;
+
     this.selected = false;
     this.animating = false;
 
@@ -126,7 +128,7 @@ class InteractiveObject {
   }
 
   highlight() {
-    if (!this.selected && !this.animating) {
+    if (!this.selected && !this.animating && this.interactive) {
       if (!this.highObject) {
         if (this.object.objName == 'cube') {
           let bbox = new THREE.Box3().setFromObject(this.object);
@@ -169,13 +171,13 @@ class InteractiveObject {
   }
 
   lowlight() {
-    if (this.highObject && this.highObject.visible !== false) {
+    if (this.highObject && this.highObject.visible !== false && this.interactive) {
       this.highObject.visible = false;
     }
   }
 
   makeColor() {
-    if (this.props.colorURL && this.props.colorURL !== '') {
+    if (this.props.colorURL && this.props.colorURL !== '' && this.interactive) {
       this.colored = true;
       if (this.bwObject) {
         this.bwObject.visible = false;
@@ -189,7 +191,7 @@ class InteractiveObject {
   }
 
   makeBW() {
-    if (this.props.bwURL && this.props.bwURL !== '') {
+    if (this.props.bwURL && this.props.bwURL !== '' && this.interactive) {
       this.colored = false;
       if (this.colorObject) {
         this.colorObject.visible = false;
@@ -203,13 +205,13 @@ class InteractiveObject {
   }
 
   show() {
-    if (this.object) { 
+    if (this.object && this.interactive) { 
       this.object.visible = true;
     }
   }
 
   hide() {
-    if (this.object) { 
+    if (this.object && this.interactive) { 
       this.object.visible = false;
       if (this.highlight) {
         this.highlight.visible = false;
@@ -219,7 +221,7 @@ class InteractiveObject {
   }
 
   select() {
-    if (!this.animating) {
+    if (!this.animating && this.interactive) {
       this.animatePosition(this.object, this.object.position.clone(), this.props.selectedPosition.clone(), 1000, () => {
         this.selected = true;
         this.animating = false;
@@ -230,7 +232,7 @@ class InteractiveObject {
   }
 
   deselect() {
-    if (!this.animating) {
+    if (!this.animating && this.interactive) {
       this.animatePosition(this.object, this.object.position.clone(), this.props.position.clone(), 500, () => {
         this.selected = false;
         this.animating = false;  
