@@ -123,7 +123,7 @@ class InteractiveObject {
     
     this.object.scale.set(0.05, 0.05, 0.05);
     this.object.position.set(0.6, 1, -2);
-    this.scene.add(this.object);
+    this.parent.add(this.object);
     this.kinectPC = new DepthDisplay(this.object, dimensions, 30, false);
   }
 
@@ -205,13 +205,13 @@ class InteractiveObject {
   }
 
   show() {
-    if (this.object && this.interactive) { 
+    if (this.object) { 
       this.object.visible = true;
     }
   }
 
   hide() {
-    if (this.object && this.interactive) { 
+    if (this.object) { 
       this.object.visible = false;
       if (this.highlight) {
         this.highlight.visible = false;
