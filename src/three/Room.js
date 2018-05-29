@@ -11,6 +11,8 @@ class Room {
     this.ready = false;
     this.loadedElements = 0;
     this.readyElements = this.props.objects.length + 1;
+    this.lastSelect = null;
+    this.lastHighlight = null;
 
     this.utils = new Utils();
 
@@ -161,7 +163,14 @@ class Room {
 
   highlightObject(name) {
     if (name !== '') {
-      this.getObj(name).highlight();
+      if (this.lastHighlight !== null) {
+        this.lastHighlight.lowlight();
+      }
+
+      const obj = this.getObj(name);
+      obj.highlight();
+
+      this.lastHighlight = obj;
     }
   }
 
@@ -177,13 +186,20 @@ class Room {
 
   selectObject(name) {
     if (name !== '') {
-      this.getObj(name).select();
+      if (this.lastSelect !== null) {
+        this.lastSelect.deselect();
+      }
+
+      let obj = this.getObj(name);
+      obj.select();
 
       if (name === 'book' && this.poemPanelsGroup !== null) {
         this.poemPanelsGroup.visible = true;
       } else if (name === 'book' && window.fontsReady) {
         this.initPoemPanelGroup();
       }
+
+      this.lastSelect = obj;
     }
   }
 
@@ -191,15 +207,18 @@ class Room {
     if (name !== '') {
       this.getObj(name).deselect();
       
-      if (name ==='book' && this.poemPanelsGroup !== null) {
+      if (name ==='book' && this.poemPanelsGroup !== null && this.poemPanelsGroup.visible !== false) {
         this.poemPanelsGroup.visible = false;
-        this.makeColor();
+        // this.makeColor();
       }
     }
   }
 
   deselectObjects() {
-    _.each(this.interactiveObjects, (obj) => { obj.deselect(); });
+    _.each(this.interactiveObjects, (obj) => { obj.deselect(); obj.lowlight() });
+    if (this.poemPanelsGroup !== null && this.poemPanelsGroup.visible !== false) {
+      this.poemPanelsGroup.visible = false;
+    }
   }
 
   toggleColor() {

@@ -10,7 +10,9 @@ class InteractiveObject {
     this.parent = parent;
     this.enabled = this.enabled;
     this.colored = this.props.colored;
+    
     this.selected = false;
+    this.animating = false;
 
     this.bwObject = null;
     this.colorObject = null;
@@ -124,48 +126,50 @@ class InteractiveObject {
   }
 
   highlight() {
-    if (!this.highObject) {
-      if (this.object.objName == 'cube') {
-        let bbox = new THREE.Box3().setFromObject(this.object);
-        this.highObject = new THREE.Mesh(
-          new THREE.BoxBufferGeometry(bbox.max.y, bbox.max.y, bbox.max.y),
-          new THREE.MeshBasicMaterial({color: 0xFFFFFF}),
-        );
+    if (!this.selected && !this.animating) {
+      if (!this.highObject) {
+        if (this.object.objName == 'cube') {
+          let bbox = new THREE.Box3().setFromObject(this.object);
+          this.highObject = new THREE.Mesh(
+            new THREE.BoxBufferGeometry(bbox.max.y, bbox.max.y, bbox.max.y),
+            new THREE.MeshBasicMaterial({color: 0xFFFFFF}),
+          );
 
-        // this.highObject.position.copy(this.object.position.clone());
-        this.highObject.position.copy(this.props.highlightOffset.clone());
-        this.highObject.rotation.copy(this.object.rotation.clone());
-        this.highObject.scale.copy(this.object.scale.clone());
-      } else {
-        this.highObject = this.object.clone();
-      }
-
-      console.log(this.object.objName, ': ', this.object.scale);
-
-      // this.highObject.scale.multiplyScalar(this.props.highlightScale);
-      this.highObject.scale.copy(this.props.highlightScale.clone());
-      this.parent.add(this.highObject);
-
-      let highlightColor = 0x00ff00;
-      this.highObject.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.material = new THREE.MeshBasicMaterial({
-            color: highlightColor,
-            side: THREE.BackSide,
-            blending: THREE.AdditiveBlending,
-            transparent: true,
-            opacity: 0.5,
-          });
-          child.material.needsUpdate = true;
+          // this.highObject.position.copy(this.object.position.clone());
+          this.highObject.position.copy(this.props.highlightOffset.clone());
+          this.highObject.rotation.copy(this.object.rotation.clone());
+          this.highObject.scale.copy(this.object.scale.clone());
+        } else {
+          this.highObject = this.object.clone();
         }
-      });
-    } else {
-      this.highObject.visible = true;
+
+        // console.log(this.object.objName, ': ', this.object.scale);
+
+        // this.highObject.scale.multiplyScalar(this.props.highlightScale);
+        this.highObject.scale.copy(this.props.highlightScale.clone());
+        this.parent.add(this.highObject);
+
+        let highlightColor = 0x00ff00;
+        this.highObject.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.material = new THREE.MeshBasicMaterial({
+              color: highlightColor,
+              side: THREE.BackSide,
+              blending: THREE.AdditiveBlending,
+              transparent: true,
+              opacity: 0.5,
+            });
+            child.material.needsUpdate = true;
+          }
+        });
+      } else {
+        this.highObject.visible = true;
+      }
     }
   }
 
   lowlight() {
-    if (this.highObject) {
+    if (this.highObject && this.highObject.visible !== false) {
       this.highObject.visible = false;
     }
   }
@@ -199,42 +203,58 @@ class InteractiveObject {
   }
 
   show() {
-    this.object.visible = true;
+    if (this.object) { 
+      this.object.visible = true;
+    }
   }
 
   hide() {
-    this.object.visible = false;
-    if (this.highlight) {
-      this.highlight.visible = false;
-      this.lowlight();
+    if (this.object) { 
+      this.object.visible = false;
+      if (this.highlight) {
+        this.highlight.visible = false;
+        this.lowlight();
+      }
     }
   }
 
   select() {
-    this.animatePosition(this.object, this.object.position.clone(), this.props.selectedPosition.clone(), 1000);
-    this.animateRotation(this.object, this.object.rotation.clone(), this.props.selectedRotation.clone(), 1000);
-    this.animateScale(this.object, this.object.scale.clone(), this.props.selectedScale.clone(), 1000);
-    this.selected = true;
+    if (!this.animating) {
+      this.animatePosition(this.object, this.object.position.clone(), this.props.selectedPosition.clone(), 1000, () => {
+        this.selected = true;
+        this.animating = false;
+      });
+      this.animateRotation(this.object, this.object.rotation.clone(), this.props.selectedRotation.clone(), 1000);
+      this.animateScale(this.object, this.object.scale.clone(), this.props.selectedScale.clone(), 1000);
+    }
   }
 
   deselect() {
-    this.animatePosition(this.object, this.object.position.clone(), this.props.position.clone(), 500);
-    this.animateRotation(this.object, this.object.rotation.clone(), this.props.rotation.clone(), 500);
-    this.animateScale(this.object, this.object.scale.clone(), this.props.scale.clone(), 500);
-    this.selected = false;
+    if (!this.animating) {
+      this.animatePosition(this.object, this.object.position.clone(), this.props.position.clone(), 500, () => {
+        this.selected = false;
+        this.animating = false;  
+      });
+      this.animateRotation(this.object, this.object.rotation.clone(), this.props.rotation.clone(), 500);
+      this.animateScale(this.object, this.object.scale.clone(), this.props.scale.clone(), 500);
+    }
   }
 
-  animatePosition(obj, from, to, time) {
+  animatePosition(obj, from, to, time, callback) {
+    this.animating = true;
+    const that = this;
     var tween = new TWEEN.Tween(from)
         .to(to, time)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(function() {
+            that.lowlight();
             obj.position.set(
               this.x,
               this.y,
               this.z,
             );
         })
+        .onComplete(callback)
         .start();
   }
 

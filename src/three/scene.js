@@ -72,7 +72,7 @@ class Scene {
 
     this.utils.loadFonts(config.fonts, () => {
       // all fonts are loaded
-      this.showReadyMessage();
+      // this.showReadyMessage();
     });
   }
 
@@ -83,9 +83,10 @@ class Scene {
   }
 
   showReadyMessage() {
-    if (this.ready && window.fontsReady) {
+    if (!this.ready) {
       this.initStartPanelGroup();
       this.changeRoom(0);
+      this.ready = true;;
     }
   }
 
@@ -346,9 +347,9 @@ class Scene {
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          // if (this.waitingRoom) {
-          //   this.startExperience();
-          // } else {
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
             if (this.selectedLeft.length > 0) {
               if (!this.currentRoom.getObj(this.selectedLeft[0]).selected) {
                 this.currentRoom.selectObject(this.selectedLeft[0]);
@@ -358,16 +359,16 @@ class Scene {
             } else {
               this.currentRoom.deselectObjects();
             }
-          // }
+          }
         });
 
       this.vr.rightTriggerStream
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          // if (this.waitingRoom) {
-          //   this.startExperience();
-          // } else {
+          if (this.waitingRoom) {
+            this.startExperience();
+          } else {
             if (this.selectedRight.length > 0) {
               if (!this.currentRoom.getObj(this.selectedRight[0]).selected) {
                 this.currentRoom.selectObject(this.selectedRight[0]);
@@ -377,7 +378,7 @@ class Scene {
             } else {
               this.currentRoom.deselectObjects();
             }
-          // }
+          }
         });
 
       this.vr.buttonAStream
@@ -695,7 +696,6 @@ class Scene {
   animate() {
     if (_.every(this.rooms, (room) => { return (room.ready === true); })) {
       this.showReadyMessage();
-      this.ready = true;
     }
 
     if (this.vr && this.vr.vrEffect) {
