@@ -1,0 +1,457 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        25.483810424804688,
+        29.173349380493164,
+        19.030952453613281
+      ],
+      "min": [
+        -19.360420227050781,
+        6.7040910720825195,
+        -21.303321838378906
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 786384,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.99970513582229614,
+        0.9859699010848999,
+        0.99995261430740356
+      ],
+      "min": [
+        -0.99987590312957764,
+        -0.99999111890792847,
+        -0.99786436557769775
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.99987643957138062,
+        0.9988057017326355,
+        0.99978882074356079,
+        1
+      ],
+      "min": [
+        -0.99998998641967773,
+        -0.99987941980361938,
+        -0.99911606311798096,
+        -1
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.99984002113342285,
+        0.98201799392700195
+      ],
+      "min": [
+        0,
+        0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 374946,
+      "max": [
+        65531
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 1572768,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        19.171180725097656,
+        24.390872955322266,
+        10.582399368286133
+      ],
+      "min": [
+        -28.938568115234375,
+        -0.21461200714111328,
+        -32.153213500976562
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 2359152,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.99987614154815674,
+        0.99977487325668335,
+        0.99992424249649048
+      ],
+      "min": [
+        -0.99997514486312866,
+        -0.99998974800109863,
+        -0.99668478965759277
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 1048512,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.99908065795898438,
+        0.99998652935028076,
+        0.99984538555145264,
+        1
+      ],
+      "min": [
+        -0.99999940395355225,
+        -0.99993103742599487,
+        -0.99974453449249268,
+        -1
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 524256,
+      "componentType": 5126,
+      "count": 65532,
+      "max": [
+        0.99846702814102173,
+        0.98732602596282959
+      ],
+      "min": [
+        0.00012399999832268804,
+        0.001003999961540103
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 1499784,
+      "componentType": 5125,
+      "count": 351438,
+      "max": [
+        65531
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 3145536,
+      "componentType": 5126,
+      "count": 41253,
+      "max": [
+        23.548847198486328,
+        28.995534896850586,
+        18.948148727416992
+      ],
+      "min": [
+        -34.419384002685547,
+        -1.1242129802703857,
+        -33.657600402832031
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 3640572,
+      "componentType": 5126,
+      "count": 41253,
+      "max": [
+        0.99997526407241821,
+        0.99946135282516479,
+        0.99992424249649048
+      ],
+      "min": [
+        -0.99995177984237671,
+        -0.99997800588607788,
+        -0.99991887807846069
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 2097024,
+      "componentType": 5126,
+      "count": 41253,
+      "max": [
+        0.99970555305480957,
+        0.99947661161422729,
+        0.99976146221160889,
+        1
+      ],
+      "min": [
+        -0.9999774694442749,
+        -0.99988007545471191,
+        -0.99997580051422119,
+        -1
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 1048512,
+      "componentType": 5126,
+      "count": 41253,
+      "max": [
+        0.99998897314071655,
+        0.98515498638153076
+      ],
+      "min": [
+        0.013092000037431717,
+        0.025620000436902046
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 2905536,
+      "componentType": 5125,
+      "count": 215265,
+      "max": [
+        41252
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "Archéomatique (https://sketchfab.com/archeomatique)",
+      "license": "CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)",
+      "source": "https://sketchfab.com/models/54eab84b69034666b631b6ad06b9bd44",
+      "title": "Castle Batenburg, Netherlands"
+    },
+    "generator": "Sketchfab-3.23.2",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 3766596,
+      "byteOffset": 0,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1378536,
+      "byteOffset": 3766596,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 4135608,
+      "byteOffset": 5145132,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2757072,
+      "byteOffset": 9280740,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 12037812,
+      "uri": "scene.bin"
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit"
+  ],
+  "images": [
+    {
+      "uri": "textures/castle_batenburg.1001_baseColor.jpeg"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "extensions": {
+        "KHR_materials_unlit": {}
+      },
+      "name": "castle_batenburg.1001",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 4,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 6,
+            "POSITION": 5,
+            "TANGENT": 7,
+            "TEXCOORD_0": 8
+          },
+          "indices": 9,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 11,
+            "POSITION": 10,
+            "TANGENT": 12,
+            "TEXCOORD_0": 13
+          },
+          "indices": 14,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "name": "RootNode (gltf orientation matrix)",
+      "rotation": [
+        -0.70710678118654746,
+        -0,
+        -0,
+        0.70710678118654757
+      ]
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.84551399946212769,
+        0.53353202342987061,
+        0.021204685792326927,
+        0,
+        -0.26168391108512878,
+        0.44866552948951721,
+        -0.85452955961227417,
+        0,
+        -0.46543270349502563,
+        0.71696776151657104,
+        0.51896971464157104,
+        0,
+        -0.42404499650001526,
+        15.359358787536621,
+        8.5612630844116211,
+        1
+      ],
+      "name": "RootNode (model correction matrix)"
+    },
+    {
+      "children": [
+        3,
+        4,
+        5
+      ],
+      "name": "castle_batenburg.obj.cleaner.materialmerger.gles"
+    },
+    {
+      "mesh": 0,
+      "name": ""
+    },
+    {
+      "mesh": 1,
+      "name": ""
+    },
+    {
+      "mesh": 2,
+      "name": ""
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "OSG_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    }
+  ]
+}
+

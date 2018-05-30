@@ -87,7 +87,7 @@ class Scene {
   showReadyMessage(fontsReady, assetsReady) {
     if (fontsReady && assetsReady) {
       this.initStartPanelGroup();
-      this.changeRoom(0);
+      // this.changeRoom(0);
     }
   }
 
@@ -665,51 +665,33 @@ class Scene {
   }
 
   addKeyboardEvents() {
-    Mousetrap.bind('1', () => { this.changeRoom(0); });
-    Mousetrap.bind('2', () => { this.changeRoom(1); });
-    Mousetrap.bind('3', () => { this.changeRoom(2); });
-    Mousetrap.bind('4', () => { this.changeRoom(3); });
-    Mousetrap.bind('5', () => { this.changeRoom(4); });
-
     Mousetrap.bind('`', () => {
-      // this.changeRoom(0);
+      // Reset Scene
       this.currentRoom.deselectObjects();
+      this.fadeOverlay('in', 1000, () => {});
     });
 
-    Mousetrap.bind('q', () => {
-      if (this.currentRoom.interactiveObjects[0].selected) {
-        this.currentRoom.interactiveObjects[0].select();
-      } else {
-        this.currentRoom.interactiveObjects[0].deselect();
-      }
+    Mousetrap.bind('1', () => {
+      // the void 
+      this.changeRoom(0);
     });
-    Mousetrap.bind('w', () => {
-      if (this.currentRoom.interactiveObjects[0].selected) {
-        this.currentRoom.interactiveObjects[0].select();
-      } else {
-        this.currentRoom.interactiveObjects[0].deselect();
-      }
+
+    Mousetrap.bind('2', () => {
+      // the drawing room
+      this.changeRoom(1); });
+    
+    Mousetrap.bind('3', () => {
+      // the armoury
+      this.changeRoom(2);
     });
-    Mousetrap.bind('r', () => {
-      if (this.currentRoom.interactiveObjects[0].selected) {
-        this.currentRoom.interactiveObjects[0].select();
-      } else {
-        this.currentRoom.interactiveObjects[0].deselect();
-      }
+
+    Mousetrap.bind('4', () => {
+      // the void 2
+      this.changeRoom(3);
     });
-    Mousetrap.bind('t', () => {
-      if (this.currentRoom.interactiveObjects[0].selected) {
-        this.currentRoom.interactiveObjects[0].select();
-      } else {
-        this.currentRoom.interactiveObjects[0].deselect();
-      }
-    });
-    Mousetrap.bind('y', () => {
-      if (this.currentRoom.interactiveObjects[0].selected) {
-        this.currentRoom.interactiveObjects[0].select();
-      } else {
-        this.currentRoom.interactiveObjects[0].deselect();
-      }
+    
+    Mousetrap.bind('5', () => {
+      this.changeRoom(4);
     });
   }
   addMouseEvents() { // Make it easy to add mouse events, etc

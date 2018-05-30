@@ -15,7 +15,7 @@ const config = {
       incoming: 3000,
       outgoing: 9999,
     },
-    dataRate: 60.0,
+    dataRate: 30.0,
   },
   copy: {
     html: {

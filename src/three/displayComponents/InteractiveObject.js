@@ -253,6 +253,14 @@ class InteractiveObject {
   }
 
   show() {
+    if (this.objName === 'kinect') {
+      this.kinectPC.enable();
+    } else {
+      if (this.kinectPC) {
+        this.kinectPC.disable();
+      }
+    }
+
     if (this.object) { 
       this.object.visible = true;
     }
