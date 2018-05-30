@@ -78,7 +78,8 @@ class DepthDisplay {
       vertexShader: require('./glsl/kinect_vertex.glsl'),
       fragmentShader: require('./glsl/kinect_fragment.glsl')
     } );
-    this.pc = new THREE.Points(this.geometry, this.material);
+    // this.pc = new THREE.Points(this.geometry, this.material);
+    this.pc = new THREE.Mesh(this.geometry, this.material);
 
     this.parent.add(this.pc);
 
@@ -132,11 +133,11 @@ class DepthDisplay {
         var positions = this.pc.geometry.attributes.position.array;
         var idx = 0;
         for (let i = 0; i < positions.length; i += 3) {
-          if (imgArray[idx] > this.dimensions.near && imgArray[idx] < this.dimensions.far) {
+          // if (imgArray[idx] > this.dimensions.near && imgArray[idx] < this.dimensions.far) {
             positions[i + 2] = this.mapRange(imgArray[idx], 0, 255, this.depthScale / 2, -this.depthScale / 2);
-          } else {
-            positions[i + 2] = 9999;
-          }
+          // } else {
+            // positions[i + 2] = 9999;
+          // }
           idx++;
         }
         break;

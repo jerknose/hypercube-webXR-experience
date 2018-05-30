@@ -158,7 +158,10 @@ class Scene {
     this.hideRooms();
 
     let newRoom = _.filter(this.rooms, (room) => {
-      return room.id == id;
+      if (room.id == id) {
+        console.log('Switching to: ' + room.name);
+        return true;
+      }
     })[0];
     newRoom.enable();
 

@@ -239,5 +239,5 @@ if (config.enabled) {
   listen(config.ports.incoming);
   broadcast(config.ports.outgoing);
   // throttle output to 30fps
-  setInterval(sendData, 1000.0 / 60.0);
+  setInterval(sendData, 1000.0 / config.dataRate);
 }

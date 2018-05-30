@@ -159,19 +159,20 @@ class InteractiveObject {
   viewKinectTransportDepth(buffer) {
     // this.kinectPC.moveSlice();
     this.kinectPC.updateDepth('kinecttransport', buffer.data);
-    this.kinectPC.updateColor('kinecttransport', buffer.data);
+    // this.kinectPC.updateColor('kinecttransport', buffer.data);
   }
 
   initDepthDisplay() {
-    const imgWidth = 512; const imgHeight = 424; // width and hight of kinect depth camera
+    const imgWidth = 512;//512; // width of kinect depth camera
+    const imgHeight = 424;// 424; // hight of kinect depth camera
     const dimensions = {
-      width: imgWidth, height: imgHeight, near: 0, far: 128,
+      width: imgWidth, height: imgHeight, near: 0, far: 255,
     };
     
     this.object.scale.set(0.05, 0.05, 0.05);
     this.object.position.set(0.6, 1, -2);
     this.parent.add(this.object);
-    this.kinectPC = new DepthDisplay(this.object, dimensions, 30, false);
+    this.kinectPC = new DepthDisplay(this.object, dimensions, 1, false);
   }
 
   highlight() {
