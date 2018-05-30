@@ -16,6 +16,8 @@ class Room {
     this.utils = new Utils();
 
     this.id = this.props.id;
+    this.name = this.props.name;
+
     this.enabled = this.props.enabled;
     this.colored = this.props.colored;
     this.type = this.props.type;
@@ -49,7 +51,9 @@ class Room {
     this.objectGroup.name = 'Room ' + this.props.id + ' Interacive Objects';
     this.parent.add(this.objectGroup);
 
+    console.log(this.props.objects);
     _.each(this.props.objects, (objProps) => {
+      console.log(objProps);
       this.interactiveObjects.push(new InteractiveObject(this.objectGroup, objProps, this.enabled));
       this.loadedElements++;
     });
@@ -285,6 +289,8 @@ class Room {
     if (this.environment) {
       this.environment.visible = true;
     }
+    console.log(this.interactiveObjects);
+    console.log(this.objectGroup.children);
     _.each(this.interactiveObjects, (obj) => {
       obj.show();
     });

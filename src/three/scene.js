@@ -666,7 +666,7 @@ class Scene {
     Mousetrap.bind('2', () => { this.changeRoom(1); });
     Mousetrap.bind('3', () => { this.changeRoom(2); });
     Mousetrap.bind('4', () => { this.changeRoom(3); });
-    Mousetrap.bind('4', () => { this.changeRoom(4); });
+    Mousetrap.bind('5', () => { this.changeRoom(4); });
 
     Mousetrap.bind('`', () => {
       // this.changeRoom(0);

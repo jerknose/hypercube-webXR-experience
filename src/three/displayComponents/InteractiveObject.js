@@ -37,6 +37,8 @@ class InteractiveObject {
       case 'kinect':
         this.initKinectTransport(this.props);
         break;
+      case 'chair':
+      case 'pedestal':
       case 'book':
       case 'violin':
       case 'mandolin':
@@ -148,13 +150,13 @@ class InteractiveObject {
     this.object.objName = props.type;
     this.kinectTransport = new KinectTransport();
     this.kinectTransport.on('Buffer', this.viewKinectTransportDepth.bind(this), 'depth', 'kinect depth');
-  }
 
-  viewKinectTransportDepth(buffer) {
     if (!this.kinectPC) { // create point cloud depth display if one doesn't exist
       this.initDepthDisplay();
     }
+  }
 
+  viewKinectTransportDepth(buffer) {
     // this.kinectPC.moveSlice();
     this.kinectPC.updateDepth('kinecttransport', buffer.data);
     this.kinectPC.updateColor('kinecttransport', buffer.data);

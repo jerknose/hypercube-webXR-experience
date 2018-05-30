@@ -10,11 +10,11 @@ const config = {
   favicon: __dirname + './../dist/images/favicon.ico',
   // input sockets
   kinectTransport: {
-    enabled: true,
     ports: {
       incoming: 3000,
       outgoing: 9999,
     },
+    dataRate: 1.0,
   },
   copy: {
     html: {
