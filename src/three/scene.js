@@ -17,6 +17,8 @@ import PanelGroup from './PanelGroup';
 import Utils from '../utils';
 import Room from './Room';
 
+import Mousetrap from 'mousetrap';
+
 class Scene {
   constructor() {
     window._scene = this;
@@ -148,6 +150,7 @@ class Scene {
     }
 
     this.addMouseEvents();
+    this.addKeyboardEvents();
     this.animate();
   }
 
@@ -658,6 +661,54 @@ class Scene {
     }
   }
 
+  addKeyboardEvents() {
+    Mousetrap.bind('1', () => { this.changeRoom(0); });
+    Mousetrap.bind('2', () => { this.changeRoom(1); });
+    Mousetrap.bind('3', () => { this.changeRoom(2); });
+    Mousetrap.bind('4', () => { this.changeRoom(3); });
+    Mousetrap.bind('4', () => { this.changeRoom(4); });
+
+    Mousetrap.bind('`', () => {
+      // this.changeRoom(0);
+      this.currentRoom.deselectObjects();
+    });
+
+    Mousetrap.bind('q', () => {
+      if (this.currentRoom.interactiveObjects[0].selected) {
+        this.currentRoom.interactiveObjects[0].select();
+      } else {
+        this.currentRoom.interactiveObjects[0].deselect();
+      }
+    });
+    Mousetrap.bind('w', () => {
+      if (this.currentRoom.interactiveObjects[0].selected) {
+        this.currentRoom.interactiveObjects[0].select();
+      } else {
+        this.currentRoom.interactiveObjects[0].deselect();
+      }
+    });
+    Mousetrap.bind('r', () => {
+      if (this.currentRoom.interactiveObjects[0].selected) {
+        this.currentRoom.interactiveObjects[0].select();
+      } else {
+        this.currentRoom.interactiveObjects[0].deselect();
+      }
+    });
+    Mousetrap.bind('t', () => {
+      if (this.currentRoom.interactiveObjects[0].selected) {
+        this.currentRoom.interactiveObjects[0].select();
+      } else {
+        this.currentRoom.interactiveObjects[0].deselect();
+      }
+    });
+    Mousetrap.bind('y', () => {
+      if (this.currentRoom.interactiveObjects[0].selected) {
+        this.currentRoom.interactiveObjects[0].select();
+      } else {
+        this.currentRoom.interactiveObjects[0].deselect();
+      }
+    });
+  }
   addMouseEvents() { // Make it easy to add mouse events, etc
     this.renderer.domElement.addEventListener('mousemove', e => this.onDocumentMouseMove(e), false);
     this.renderer.domElement.addEventListener('mousedown', e => this.onDocumentMouseDown(e), false);

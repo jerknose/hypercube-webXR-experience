@@ -70,7 +70,7 @@ class PanelGroup {
         this.panelsGroup.add(panel);
       });
 
-      this.panelsGroup.visible = true;
+      // this.panelsGroup.visible = true;
       this.isAnimating = false;
       this.isOpen = false;
     }
@@ -111,12 +111,26 @@ class PanelGroup {
     this.panelsGroup.visible = true;
     // this.fadeByPanel('in', 1000, 250);
     // this.moveByPanel('in', 500, 250);
+
+    // this.panelsGroup.traverse((child) => {
+    //   if (child instanceof THREE.Mesh) {
+    //     child.material.opacity = 0;
+    //     child.material.transparent = true;
+    //   }
+    // });
   }
 
   hide() {
     this.panelsGroup.visible = false;
     // this.fadeByPanel('out', 250, 125);
     // this.moveByPanel('out', 500, 100);
+
+    // this.panelsGroup.traverse((child) => {
+    //   if (child instanceof THREE.Mesh) {
+    //     child.material.opacity = 1;
+    //     child.material.transparent = false;
+    //   }
+    // });
   }
 
   togglePanelOpen() {

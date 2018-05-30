@@ -40,7 +40,7 @@ class VR {
     });
     this.line = new THREE.Line(lineGeo, lineMat);
     this.line.name = 'line';
-    this.line.scale.z = 5;
+    this.line.scale.z = 10;
 
     this.group;
 
@@ -380,9 +380,15 @@ class VR {
     this.tempMatrix.identity().extractRotation(controller.matrixWorld);
     this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
     this.raycaster.ray.near = 0.5;
-    this.raycaster.ray.far = 5;
+    this.raycaster.ray.far = 7;
     this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
-    return _.uniq(_.map(this.raycaster.intersectObjects(objects, true), (obj) => { return this.findParent(obj.object); }));
+    const intersections = this.raycaster.intersectObjects(objects, true);
+    if (intersections.length > 0 && controller.children[1]) {
+      controller.children[1].scale.z = intersections[0].distance;
+    } else if (controller.children[1]) {
+      controller.children[1].scale.z = 10;
+    }
+    return _.uniq(_.map(intersections, (obj) => { return this.findParent(obj.object); }));
   }
 
   findParent(object) {

@@ -4,6 +4,8 @@ import Hypercube from '../hypercube';
 import KinectTransport from '../../inputs/KinectTransport';
 import DepthDisplay from './DepthDisplay';
 
+import PanelGroup from '../PanelGroup';
+
 class InteractiveObject {
   constructor(parent, objProps, enabled) {
     this.props = objProps;
@@ -30,6 +32,8 @@ class InteractiveObject {
         console.log(this.props.type, ' not found');
         return false;
         break;
+      case 'poem':
+        this.initPoem(this.props);
       case 'kinect':
         this.initKinectTransport(this.props);
         break;
@@ -53,6 +57,47 @@ class InteractiveObject {
     }
   }
 
+  initPoem(props) {
+    this.bgPadding = [1.25, 2.5, 1.25, 2.5]; // top, right, bottom, left
+    this.bgCornerRadius = [0, 0, 0, 0]; // top-left, top-right, bottom-right, bottom-left
+    this.bgOpacity = 0.3;
+    this.bgThickness = 0.01;
+    this.bgColor = 0x000000;
+
+    this.poemPG = new PanelGroup();
+    this.poemPG.drawPanels([
+      {
+        type: 'text',
+        value: props.text,
+        style: {
+          size: 3, // cap height in cm
+          color: 0xFFFFFF,
+          weight: 'bold', // bold or regular
+        },
+        align: 'center',
+        padding: [0, 0, 0, 0], // top, right, bottom, left
+      },
+    ],
+    {
+      width: props.width, // 0 or 'auto' for auto width, number for fixed width
+      thickness: this.bgThickness,
+      opacity: 0, // this.bgOpacity,
+      padding: this.bgPadding,
+      cornerRadius: this.bgCornerRadius,
+      color: this.bgColor,
+      position: new THREE.Vector3(0, 0, 0),
+      align: ['top', 'center'], // 'top' or 'bottom', 'left' or 'center' or 'right'
+      fonts: window.fonts,
+      layerSeparation: this.layerSeparation,
+    },
+    window.fonts);
+    this.object = this.poemPG.getPanelsGroup();
+    this.object.objName = props.type;
+    this.object.position.copy(props.position.clone());
+    this.object.rotation.copy(this.props.rotation.clone());
+    this.parent.add(this.object);
+  }
+
   addHypercube(props) { // Add assets to scene
     this.hc = new Hypercube(props.active);
     if (!this.object) { this.object = new THREE.Object3D(); }
@@ -62,8 +107,8 @@ class InteractiveObject {
 
     this.object.position.copy(props.position.clone());
     this.object.rotation.copy(props.rotation.clone());
-
-    // this.object.visible = this.enabled;
+    this.object.scale.copy(props.scale.clone());
+    // this.object.visible = false;
 
     this.parent.add(this.object);
   }
@@ -220,10 +265,10 @@ class InteractiveObject {
     }
   }
 
-  select() {
-    if (!this.animating && this.interactive) {
+  select(name) {
+    if (!this.animating && this.interactive && !this.selected) {
+      this.selected = true;
       this.animatePosition(this.object, this.object.position.clone(), this.props.selectedPosition.clone(), 1000, () => {
-        this.selected = true;
         this.animating = false;
       });
       this.animateRotation(this.object, this.object.rotation.clone(), this.props.selectedRotation.clone(), 1000);
@@ -231,11 +276,33 @@ class InteractiveObject {
     }
   }
 
-  deselect() {
+  forceSelect(name) {
+    if (!this.animating && !this.selected) {
+      this.selected = true;
+      this.animatePosition(this.object, this.object.position.clone(), this.props.selectedPosition.clone(), 1000, () => {
+        this.animating = false;
+      });
+      this.animateRotation(this.object, this.object.rotation.clone(), this.props.selectedRotation.clone(), 1000);
+      this.animateScale(this.object, this.object.scale.clone(), this.props.selectedScale.clone(), 1000);
+    }
+  }
+
+  deselect(name) {
     if (!this.animating && this.interactive) {
       this.animatePosition(this.object, this.object.position.clone(), this.props.position.clone(), 500, () => {
-        this.selected = false;
         this.animating = false;  
+        this.selected = false;
+      });
+      this.animateRotation(this.object, this.object.rotation.clone(), this.props.rotation.clone(), 500);
+      this.animateScale(this.object, this.object.scale.clone(), this.props.scale.clone(), 500);
+    }
+  }
+
+  forceDeselect(name) {
+    if (!this.animating && this.interactive) {
+      this.animatePosition(this.object, this.object.position.clone(), this.props.position.clone(), 500, () => {
+        this.animating = false;  
+        this.selected = false;
       });
       this.animateRotation(this.object, this.object.rotation.clone(), this.props.rotation.clone(), 500);
       this.animateScale(this.object, this.object.scale.clone(), this.props.scale.clone(), 500);
@@ -243,49 +310,55 @@ class InteractiveObject {
   }
 
   animatePosition(obj, from, to, time, callback) {
-    this.animating = true;
-    const that = this;
-    var tween = new TWEEN.Tween(from)
-        .to(to, time)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(function() {
-            that.lowlight();
-            obj.position.set(
-              this.x,
-              this.y,
-              this.z,
-            );
-        })
-        .onComplete(callback)
-        .start();
+    if (!_.isEqual(obj.position, to)) {
+      this.animating = true;
+      const that = this;
+      var tween = new TWEEN.Tween(from)
+          .to(to, time)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(function() {
+              that.lowlight();
+              obj.position.set(
+                this.x,
+                this.y,
+                this.z,
+              );
+          })
+          .onComplete(callback)
+          .start();
+    }
   }
 
   animateRotation(obj, from, to, time) {
-    var tween = new TWEEN.Tween(from)
-        .to(to, time)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(function() {
-            obj.rotation.set(
-              this.x,
-              this.y,
-              this.z,
-            );
-        })
-        .start();
+    if (!_.isEqual(obj.rotation, to)) {
+      var tween = new TWEEN.Tween(from)
+          .to(to, time)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(function() {
+              obj.rotation.set(
+                this.x,
+                this.y,
+                this.z,
+              );
+          })
+          .start();
+    }
   }
 
   animateScale(obj, from, to, time) {
-    var tween = new TWEEN.Tween(from)
-        .to(to, time)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(function() {
-            obj.scale.set(
-              this.x,
-              this.y,
-              this.z,
-            );
-        })
-        .start();
+    if (!_.isEqual(obj.scale, to)) {
+      var tween = new TWEEN.Tween(from)
+          .to(to, time)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(function() {
+              obj.scale.set(
+                this.x,
+                this.y,
+                this.z,
+              );
+          })
+          .start();
+    }
   }
 
   update() {

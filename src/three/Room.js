@@ -11,7 +11,6 @@ class Room {
     this.ready = false;
     this.loadedElements = 0;
     this.readyElements = this.props.objects.length + 1;
-    this.lastSelect = null;
     this.lastHighlight = null;
 
     this.utils = new Utils();
@@ -27,9 +26,6 @@ class Room {
 
     this.initEnvironment();
     this.initInteractiveObjects();
-    if (window.fontsReady) {
-      this.initPoemPanelGroup();
-    }
   }
 
   initEnvironment() {
@@ -116,18 +112,18 @@ class Room {
     this.loadedElements++;
   }
 
-  initPoemPanelGroup() {
+  initPoemPanelGroup(props) {
     this.bgPadding = [1.25, 2.5, 1.25, 2.5]; // top, right, bottom, left
     this.bgCornerRadius = [0, 0, 0, 0]; // top-left, top-right, bottom-right, bottom-left
     this.bgOpacity = 0.3;
     this.bgThickness = 0.01;
     this.bgColor = 0x000000;
 
-    this.startPG = new PanelGroup();
-    this.startPG.drawPanels([
+    this.poemPG = new PanelGroup();
+    this.poemPG.drawPanels([
       {
         type: 'text',
-        value: this.props.text.content,
+        value: props.text.content,
         style: {
           size: 3, // cap height in cm
           color: 0xFFFFFF,
@@ -138,7 +134,7 @@ class Room {
       },
     ],
     {
-      width: this.props.text.width, // 0 or 'auto' for auto width, number for fixed width
+      width: props.text.width, // 0 or 'auto' for auto width, number for fixed width
       thickness: this.bgThickness,
       opacity: 0, // this.bgOpacity,
       padding: this.bgPadding,
@@ -150,9 +146,9 @@ class Room {
       layerSeparation: this.layerSeparation,
     },
     window.fonts);
-    this.poemPanelsGroup = this.startPG.getPanelsGroup();
-    this.poemPanelsGroup.position.copy(this.props.text.position.clone());
-    this.poemPanelsGroup.rotation.copy(this.props.text.rotation.clone());
+    this.poemPanelsGroup = this.poemPG.getPanelsGroup();
+    this.poemPanelsGroup.position.copy(props.text.position.clone());
+    this.poemPanelsGroup.rotation.copy(props.text.rotation.clone());
     this.parent.add(this.poemPanelsGroup);
     this.loadedElements++;
   }
@@ -188,40 +184,63 @@ class Room {
 
   selectObject(name) {
     if (name !== '') {
-      if (this.lastSelect !== null) {
-        this.lastSelect.deselect();
-      }
+      _.each(this.interactiveObjects, (obj, idx) => {
+        if (obj.objName !== 'cube') {
+          if (this.getObj('cube').selected && name !== 'book') {
+            obj.deselect(obj.objName);
+          }
+        } else {
+          obj.forceDeselect(obj.objName);
+        }
 
-      let obj = this.getObj(name);
-      obj.select();
+        if (name !== 'book' && this.poemPanelsGroup !== null) {
+          this.poemPanelsGroup.visible = false;
+        }
+        obj.lowlight();
+        if (idx+1 == this.interactiveObjects.length) {
+          if (name !== 'book') {
+            let cube = this.getObj('cube');
+            cube.forceSelect('cube');
+          }
 
-      if (name === 'book' && this.poemPanelsGroup !== null) {
-        this.poemPanelsGroup.visible = true;
-      } else if (name === 'book' && window.fontsReady) {
-        this.initPoemPanelGroup();
-      }
-
-      this.lastSelect = obj;
+          if (name == 'book' && this.poemPanelsGroup !== null) {
+            this.poemPanelsGroup.visible = true;
+          }
+    
+          let obj = this.getObj(name);
+          obj.select(name);
+        }
+      });
     }
   }
 
   deselectObject(name) {
     if (name !== '') {
-      this.getObj(name).deselect();
-      this.lastSelect = null;
-      if (name ==='book' && this.poemPanelsGroup !== null && this.poemPanelsGroup.visible !== false) {
-        this.poemPanelsGroup.visible = false;
-        // this.makeColor();
-      }
+      _.each(this.initInteractiveObjects, (obj) => {
+        if (obj.objName == 'cube') {
+          obj.forceDeselect();
+        } else {
+          obj.deselect();
+        }
+        if (this.poemPanelsGroup !== null) {
+          this.poemPanelsGroup.visible = false;
+        }
+      });
     }
   }
 
   deselectObjects() {
-    _.each(this.interactiveObjects, (obj) => { obj.deselect(); obj.lowlight() });
-    if (this.poemPanelsGroup !== null && this.poemPanelsGroup.visible !== false) {
+    _.each(this.interactiveObjects, (obj) => {
+      if (obj.objName == 'cube') {
+        obj.forceDeselect();
+      } else {
+        obj.deselect();
+      }
+      obj.lowlight();
+    });
+    if (this.poemPanelsGroup !== null) {
       this.poemPanelsGroup.visible = false;
     }
-    this.lastSelect = null;
   }
 
   toggleColor() {
@@ -285,6 +304,10 @@ class Room {
   update() {
     if (this.loadedElements == this.readyElements && this.ready !== true) {
       this.ready = true;
+    }
+
+    if (window.fontsReady && this.poemPanelsGroup == null && this.props.text) {
+      this.initPoemPanelGroup(this.props);
     }
 
     if (this.interactiveObjects.length > 0) {
