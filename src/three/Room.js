@@ -200,10 +200,10 @@ class Room {
         }
         obj.lowlight();
         if (idx+1 == this.interactiveObjects.length) {
-          if (name !== 'book') {
-            let cube = this.getObj('cube');
-            cube.forceSelect('cube');
-          }
+          // if (name !== 'book') {
+          //   let cube = this.getObj('cube');
+          //   cube.forceSelect('cube');
+          // }
 
           if (name == 'book' && this.poemPanelsGroup !== null) {
             this.poemPanelsGroup.visible = true;
@@ -219,7 +219,7 @@ class Room {
   deselectObject(name) {
     if (name !== '') {
       _.each(this.initInteractiveObjects, (obj) => {
-        if (obj.objName == 'cube') {
+        if (obj.objName === 'cube') {
           obj.forceDeselect();
         } else {
           obj.deselect();
@@ -233,7 +233,8 @@ class Room {
 
   deselectObjects() {
     _.each(this.interactiveObjects, (obj) => {
-      if (obj.objName == 'cube') {
+      // console.log('asdasdfa', obj.objName);
+      if (obj.objName === 'cube') {
         obj.forceDeselect();
       } else {
         obj.deselect();

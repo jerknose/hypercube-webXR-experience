@@ -202,6 +202,14 @@ class Hypercube {
     );
   }
 
+  activate() {
+    this.active = true;
+  }
+
+  deactivate() {
+    this.active = false;
+  }
+
   update(timestamp) {
     if (this.active) {
       const deltaTime = (timestamp - this.lastTime);

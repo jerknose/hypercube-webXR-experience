@@ -56,6 +56,8 @@ class Scene {
     this.bgThickness = 0.01;
     this.bgColor = 0x000000;
 
+    this.overlayIn = true;
+
     // let assetCheck = 0;
     // _.each(this.rooms, (room) => {
     //   this.utils.loadGLTF('models/gltf/' + room.name + '/scene.gltf', (gltf) => {
@@ -276,16 +278,18 @@ class Scene {
       end = { time: 4.7, alpha: 1 };
     }
   
-    let that = this;
-    new TWEEN.Tween(start)
-        .to(end, length)
-        .easing(TWEEN.Easing.Linear.None)
-        .onUpdate(function() {
-          that.overlay.material.uniforms.time.value = this.time;
-          that.overlay.material.uniforms.alpha.value = this.alpha;
-        })
-        .onComplete(cb)
-        .start();
+    // if ((this.overlayIn == true && direction !== 'in') && this.overlayIn == false && direction !== 'out') {
+      let that = this;
+      new TWEEN.Tween(start)
+          .to(end, length)
+          .easing(TWEEN.Easing.Linear.None)
+          .onUpdate(function() {
+            that.overlay.material.uniforms.time.value = this.time;
+            that.overlay.material.uniforms.alpha.value = this.alpha;
+          })
+          .onComplete(cb)
+          .start();
+    // }
   }
 
   drawHypercubeText() {
@@ -371,9 +375,9 @@ class Scene {
         .distinctUntilChanged()
         .filter(x => x)
         .subscribe((x) => {
-          if (this.waitingRoom) {
-            this.startExperience();
-          } else {
+          // if (this.waitingRoom) {
+          //   this.startExperience();
+          // } else {
             if (this.selectedRight.length > 0) {
               if (!this.currentRoom.getObj(this.selectedRight[0]).selected) {
                 this.currentRoom.selectObject(this.selectedRight[0]);
@@ -383,7 +387,7 @@ class Scene {
             } else {
               this.currentRoom.deselectObjects();
             }
-          }
+          // }
         });
 
       this.vr.buttonAStream
@@ -668,32 +672,90 @@ class Scene {
     Mousetrap.bind('`', () => {
       // Reset Scene
       this.currentRoom.deselectObjects();
-      this.fadeOverlay('in', 1000, () => {});
+      this.overlay.material.uniforms.time.value = 4.7;
+      this.overlay.material.uniforms.alpha.value = 1;
+      // the void calm
+      this.changeRoom(0);
+      // this.overlayIn = true;
     });
 
     Mousetrap.bind('1', () => {
-      // the void 
-      this.changeRoom(0);
+      this.fadeOverlay('out', 2000, () => {})
     });
 
     Mousetrap.bind('2', () => {
-      // the drawing room
-      this.changeRoom(1); });
+      this.fadeOverlay('in', 2000, () => {
+        // this.overlayIn = true;
+      });
+    });
     
     Mousetrap.bind('3', () => {
-      // the armoury
-      this.changeRoom(2);
+      // the drawing room
+      this.changeRoom(1);
+      this.fadeOverlay('out', 2000, () => {
+        // this.overlayIn = false;
+      });
     });
 
     Mousetrap.bind('4', () => {
-      // the void 2
-      this.changeRoom(3);
+      this.fadeOverlay('in', 2000, () => {
+        // this.overlayIn = true;
+      });
     });
-    
+
     Mousetrap.bind('5', () => {
+      // the armoury
+      this.changeRoom(2);
+      this.fadeOverlay('out', 2000, () => {
+        // this.overlayIn = false;
+      });
+    });
+
+    Mousetrap.bind('6', () => {
+      this.fadeOverlay('in', 2000, () => {
+        // this.overlayIn = true;
+      });
+    });
+
+    Mousetrap.bind('7', () => {
+      // the void storm
+      this.changeRoom(3);
+      this.fadeOverlay('out', 2000, () => {
+        // this.overlayIn = false;
+      });
+    });
+
+    Mousetrap.bind('8', () => {
+      _scene.currentRoom.interactiveObjects[4].hc.activate()
+    });
+
+    Mousetrap.bind('9', () => {
+      this.fadeOverlay('in', 2000, () => {
+        // this.overlayIn = true;
+      });
+    });
+
+    Mousetrap.bind('0', () => {
+      // the void storm
       this.changeRoom(4);
+      this.fadeOverlay('out', 2000, () => {
+        // this.overlayIn = false;
+      });
+    });
+
+    Mousetrap.bind('-', () =>   {
+      this.fadeOverlay('in', 2000, () => {
+      });
+    });
+
+    Mousetrap.bind('=', () =>   {
+      this.changeRoom(5);
+      this.fadeOverlay('out', 2000, () => {
+        // this.overlayIn = false;
+      });
     });
   }
+
   addMouseEvents() { // Make it easy to add mouse events, etc
     this.renderer.domElement.addEventListener('mousemove', e => this.onDocumentMouseMove(e), false);
     this.renderer.domElement.addEventListener('mousedown', e => this.onDocumentMouseDown(e), false);
