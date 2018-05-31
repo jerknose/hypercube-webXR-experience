@@ -669,7 +669,7 @@ class Scene {
   }
 
   addKeyboardEvents() {
-    Mousetrap.bind('1', () => {
+    Mousetrap.bind('`', () => {
       // Reset Scene
       this.currentRoom.deselectObjects();
       this.overlay.material.uniforms.time.value = 4.7;
@@ -679,17 +679,17 @@ class Scene {
       // this.overlayIn = true;
     });
 
-    Mousetrap.bind('2', () => {
+    Mousetrap.bind('1', () => {
       this.fadeOverlay('out', 2000, () => {})
     });
 
-    Mousetrap.bind('3', () => {
+    Mousetrap.bind('2', () => {
       this.fadeOverlay('in', 2000, () => {
         // this.overlayIn = true;
       });
     });
     
-    Mousetrap.bind('4', () => {
+    Mousetrap.bind('3', () => {
       // the drawing room
       this.changeRoom(1);
       this.fadeOverlay('out', 2000, () => {
@@ -697,13 +697,13 @@ class Scene {
       });
     });
 
-    Mousetrap.bind('5', () => {
+    Mousetrap.bind('4', () => {
       this.fadeOverlay('in', 2000, () => {
         // this.overlayIn = true;
       });
     });
 
-    Mousetrap.bind('6', () => {
+    Mousetrap.bind('5', () => {
       // the armoury
       this.changeRoom(2);
       this.fadeOverlay('out', 2000, () => {
@@ -711,13 +711,13 @@ class Scene {
       });
     });
 
-    Mousetrap.bind('7', () => {
+    Mousetrap.bind('6', () => {
       this.fadeOverlay('in', 2000, () => {
         // this.overlayIn = true;
       });
     });
 
-    Mousetrap.bind('8', () => {
+    Mousetrap.bind('7', () => {
       // the void storm
       this.changeRoom(3);
       this.fadeOverlay('out', 2000, () => {
@@ -725,17 +725,17 @@ class Scene {
       });
     });
 
-    Mousetrap.bind('9', () => {
+    Mousetrap.bind('8', () => {
       _scene.currentRoom.interactiveObjects[4].hc.activate()
     });
 
-    Mousetrap.bind('0', () => {
+    Mousetrap.bind('9', () => {
       this.fadeOverlay('in', 2000, () => {
         // this.overlayIn = true;
       });
     });
 
-    Mousetrap.bind('i', () => {
+    Mousetrap.bind('0', () => {
       // the void storm
       this.changeRoom(4);
       this.fadeOverlay('out', 2000, () => {
@@ -743,12 +743,12 @@ class Scene {
       });
     });
 
-    Mousetrap.bind('o', () =>   {
+    Mousetrap.bind('-', () =>   {
       this.fadeOverlay('in', 2000, () => {
       });
     });
 
-    Mousetrap.bind('p', () =>   {
+    Mousetrap.bind('=', () =>   {
       this.changeRoom(5);
       this.fadeOverlay('out', 2000, () => {
         // this.overlayIn = false;
