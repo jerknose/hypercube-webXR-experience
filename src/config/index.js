@@ -204,7 +204,7 @@ const defaults = {
       },
       enabled: false, colored: false,
       bwURL: 'models/gltf/the_armoury/scene.gltf', colorURL: 'models/gltf/the_armoury/textures/model_Material_u1_v1_baseColor_color.jpeg',
-      position: new THREE.Vector3(0.35, -0.35, -0.889),
+      position: new THREE.Vector3(0.2, -0.35, -2.4),
       rotation: new THREE.Euler(0, 0.8, 0),
       scale: 0.28,
       objects: [

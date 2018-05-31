@@ -748,7 +748,7 @@ class Scene {
       });
     });
 
-    Mousetrap.bind('\', () =>   {
+    Mousetrap.bind('\\', () =>   {
       this.changeRoom(5);
       this.fadeOverlay('out', 2000, () => {
         // this.overlayIn = false;
