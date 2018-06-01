@@ -166,7 +166,7 @@ class InteractiveObject {
     const imgWidth = 512;//512; // width of kinect depth camera
     const imgHeight = 424;// 424; // hight of kinect depth camera
     const dimensions = {
-      width: imgWidth, height: imgHeight, near: 0, far: 125,
+      width: imgWidth, height: imgHeight, near: 0, far: 255,
     };
     
     this.object.scale.set(0.05, 0.05, 0.05);
