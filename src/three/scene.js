@@ -80,6 +80,10 @@ class Scene {
     });
   }
 
+  forceText() {
+    this.currentRoom.poemPanelsGroup.visible = true;
+  }
+
   startExperience() {
     this.waitingRoom = false;
     if (this.startPG) { this.startPG.destroyPanels(); }
@@ -675,6 +679,10 @@ class Scene {
   }
 
   addKeyboardEvents() {
+    Mousetrap.bind('space', () => {
+      this.forceText();
+    });
+
     Mousetrap.bind('esc', () => {
       this.deselectEverything();
     });
