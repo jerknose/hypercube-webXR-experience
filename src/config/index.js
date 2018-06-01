@@ -19,7 +19,7 @@ const defaults = {
       rotation: new THREE.Euler(),
       scale: 0,
       text: {
-        content: 'The amncient lost study of the Hypercube shows that Geomertry is an exercise in "direct percetion" a way of seeing into the heart of reality and beyond it to the realm of ideal or ultimate truths. When we learn to visualize we wake up an inner sense that there is a higher, more real dimensionally complex world above our own. Through proper practice the hypernaut can begin to previously invisible 4d objects overlaid in 3d space, and even to pass between those dimensions.',
+        content: 'The ancient lost study of the Hypercube shows that Geometry is an exercise in "direct perception" a way of seeing into the heart of reality and beyond it to the realm of ideal or ultimate truths. When we learn to visualize we wake up an inner sense that there is a higher, more real dimensionally complex world above our own. Through proper practice the hypernaut can begin to previously invisible 4d objects overlaid in 3d space, and even to pass between those dimensions.',
         // position: new THREE.Vector3(0.25, 1.25, -0.9),
         position: new THREE.Vector3(0.35, 1.45, -0.9),
         rotation: new THREE.Euler(0, -0.1, 0),
@@ -108,7 +108,7 @@ const defaults = {
       id: 1, name: 'The Drawing Room',
       type: 'gltf',
       text: {
-        content: 'Do you remember when we first met my love? That was the first time I think I felt the brush of another world, a world beyond description. The only things that ever found to compare to it was music. Do you remember the frist I ever played that song for you? I could feel the corners of our Euclidian Geometry melting my heart. Even now hearing the sound of it brings me right back to the sunny afteroon music room. Remember how I played my instrument for you, and we realized that my mind was only one part of the equation, the other was feeling.',
+        content: 'Do you remember the first I ever played that song for you? I could feel the corners of our Euclidian Geometry melting along with my heart. I\'ve encoded the key to the next room in the instrument I played for you. Come to me darling!',
         // position: new THREE.Vector3(0.25, 1.25, -0.9),
         position: new THREE.Vector3(0.35, 1.45, -0.9),
         rotation: new THREE.Euler(0, -0.1, 0),
@@ -196,7 +196,7 @@ const defaults = {
       id: 2, name: 'The Armoury',
       type: 'gltf',
       text: {
-        content: 'Experiment 32: Do you remember the battle my darling? We just escaped Hybernia with our lives. You were brave to defend me from those pirates, but I know the toll it took to do violence on another. Much of our work has made me see cruelty is just a cycle of life, and no matter how we deny it, the decree that life feeds on life seems to be written in the orbit of the planets themselves... I am making a solo experiment today, to see if this is true, my love. I have put the memory in the weapon you used that day. - Yvonne',
+        content: 'Do you remember the battle my darling? We just escaped Hypernia with our lives. You were brave to defend me from those pirates. the decree that life feeds on life seems to be written in the orbit of the planets themselves...  I have put the key in the weapon you used that day. - Yvonne',
         // position: new THREE.Vector3(-0.100, -4.163, -0.049),
         position: new THREE.Vector3(0.25, 1.25, -0.889),
         rotation: new THREE.Euler(0, -0.1, 0),
