@@ -156,6 +156,12 @@ class Scene {
     this.animate();
   }
 
+  deselectEverything() {
+    _.each(this.rooms, (room) => {
+      room.deselectObjects();
+    });
+  }
+
   changeRoom(id) {
     this.hideRooms();
 
@@ -669,6 +675,10 @@ class Scene {
   }
 
   addKeyboardEvents() {
+    Mousetrap.bind('esc', () => {
+      this.deselectEverything();
+    });
+
     Mousetrap.bind('`', () => {
       // Reset Scene
       this.currentRoom.deselectObjects();
