@@ -7,7 +7,8 @@ class Utils {
   loadFonts(fontList, callback) {
     window.fonts = fontList;
     _.each(fontList, (fontDef) => {
-        loadFont(fontDef.json, (err, font) => {
+        console.log(window.location.href + fontDef.json);
+        loadFont(window.location.href + fontDef.json, (err, font) => {
             if (err) throw err;
             THREE.ImageUtils.loadTexture(fontDef.png, undefined, (texture) => {
                 fontDef.font = font;

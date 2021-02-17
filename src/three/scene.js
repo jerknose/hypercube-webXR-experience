@@ -119,7 +119,7 @@ class Scene {
     this.addLights();
 
     if (config.debug) {
-      this.scene.add(new THREE.AxisHelper(5));
+      this.scene.add(new THREE.AxesHelper(5));
     }
 
     this.camera = new THREE.PerspectiveCamera(20, this.w / this.h, 1/1000, 1000);

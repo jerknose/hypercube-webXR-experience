@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const { resolve } = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const config = require('./server/config.js');
 
@@ -11,12 +12,12 @@ module.exports = {
 		// the entry point of our app
 	],
 	output: {
-		filename: 'bundle.js',
+		filename: '[name].[hash:10].js',
 		// the output bundle
 
 		path: resolve(__dirname, 'dist'),
 
-		publicPath: '/'
+		publicPath: ''
 		// necessary for HMR to know where to load the hot update chunks
 	},
 	module: {
@@ -70,11 +71,14 @@ module.exports = {
 		extensions: ['.js', '.jsx', '.css']
 	},
 	plugins: [
+		new HtmlWebpackPlugin({
+			template: './html/index.html',
+		}),
 		new CopyWebpackPlugin([
-      {
-        from: resolve(__dirname, config.copy.html.src),
-        to: resolve(__dirname, config.copy.html.dest),
-      },
+      // {
+      //   from: resolve(__dirname, config.copy.html.src),
+      //   to: resolve(__dirname, config.copy.html.dest),
+      // },
       {
         from: resolve(__dirname, config.copy.fonts.src),
         to: resolve(__dirname, config.copy.fonts.dest),
@@ -90,8 +94,8 @@ module.exports = {
       {
         from: resolve(__dirname, config.copy.textures.src),
         to: resolve(__dirname, config.copy.textures.dest),
-			},
-			{
+      },
+      {
         from: resolve(__dirname, config.copy.bmfonts.src),
         to: resolve(__dirname, config.copy.bmfonts.dest),
       },
@@ -110,7 +114,7 @@ module.exports = {
 
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      filename: 'vendor.js',
+			filename: '[name].[hash:10].js',
       minChunks: (module) => {
         // this assumes your vendor imports exist in the node_modules directory
         return module.context && module.context.indexOf('node_modules') !== -1;

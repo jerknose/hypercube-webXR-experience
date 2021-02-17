@@ -1,8 +1,8 @@
 import Utils from '../../utils';
 import Hypercube from '../hypercube';
 
-import KinectTransport from '../../inputs/KinectTransport';
-import DepthDisplay from './DepthDisplay';
+// import KinectTransport from '../../inputs/KinectTransport';
+// import DepthDisplay from './DepthDisplay';
 
 import PanelGroup from '../PanelGroup';
 
@@ -34,9 +34,9 @@ class InteractiveObject {
         break;
       case 'poem':
         this.initPoem(this.props);
-      case 'kinect':
-        this.initKinectTransport(this.props);
-        break;
+      // case 'kinect':
+      //   // this.initKinectTransport(this.props);
+      //   break;
       case 'chair':
       case 'pedestal':
       case 'book':
@@ -145,35 +145,35 @@ class InteractiveObject {
     this.parent.add(this.object);
   }
 
-  initKinectTransport(props) {
-    if (!this.object) { this.object = new THREE.Object3D(); }
-    this.object.objName = props.type;
-    this.kinectTransport = new KinectTransport();
-    this.kinectTransport.on('Buffer', this.viewKinectTransportDepth.bind(this), 'depth', 'kinect depth');
+  // initKinectTransport(props) {
+  //   // if (!this.object) { this.object = new THREE.Object3D(); }
+  //   // this.object.objName = props.type;
+  //   // this.kinectTransport = new KinectTransport();
+  //   // this.kinectTransport.on('Buffer', this.viewKinectTransportDepth.bind(this), 'depth', 'kinect depth');
 
-    if (!this.kinectPC) { // create point cloud depth display if one doesn't exist
-      this.initDepthDisplay();
-    }
-  }
+  //   // if (!this.kinectPC) { // create point cloud depth display if one doesn't exist
+  //   //   this.initDepthDisplay();
+  //   // }
+  // }
 
-  viewKinectTransportDepth(buffer) {
-    // this.kinectPC.moveSlice();
-    this.kinectPC.updateDepth('kinecttransport', buffer.data);
-    // this.kinectPC.updateColor('kinecttransport', buffer.data);
-  }
+  // viewKinectTransportDepth(buffer) {
+  //   // this.kinectPC.moveSlice();
+  //   // this.kinectPC.updateDepth('kinecttransport', buffer.data);
+  //   // this.kinectPC.updateColor('kinecttransport', buffer.data);
+  // }
 
-  initDepthDisplay() {
-    const imgWidth = 512;//512; // width of kinect depth camera
-    const imgHeight = 424;// 424; // hight of kinect depth camera
-    const dimensions = {
-      width: imgWidth, height: imgHeight, near: 0, far: 255,
-    };
+  // initDepthDisplay() {
+  //   // const imgWidth = 512;//512; // width of kinect depth camera
+  //   // const imgHeight = 424;// 424; // hight of kinect depth camera
+  //   // const dimensions = {
+  //   //   width: imgWidth, height: imgHeight, near: 0, far: 255,
+  //   // };
     
-    this.object.scale.set(0.05, 0.05, 0.05);
-    this.object.position.set(0.6, 1, -2);
-    this.parent.add(this.object);
-    this.kinectPC = new DepthDisplay(this.object, dimensions, 1, false);
-  }
+  //   // this.object.scale.set(0.05, 0.05, 0.05);
+  //   // this.object.position.set(0.6, 1, -2);
+  //   // this.parent.add(this.object);
+  //   // this.kinectPC = new DepthDisplay(this.object, dimensions, 1, false);
+  // }
 
   highlight() {
     if (!this.selected && !this.animating && this.interactive) {
@@ -253,17 +253,17 @@ class InteractiveObject {
   }
 
   show() {
-    if (this.objName === 'kinect') {
-      this.kinectPC.enable();
-    } else {
-      if (this.kinectPC) {
-        this.kinectPC.disable();
-      }
-    }
+    // if (this.objName === 'kinect') {
+    //   this.kinectPC.enable();
+    // } else {
+    //   if (this.kinectPC) {
+    //     this.kinectPC.disable();
+    //   }
+    // }
 
-    if (this.object) { 
-      this.object.visible = true;
-    }
+    // if (this.object) { 
+    //   this.object.visible = true;
+    // }
   }
 
   hide() {

@@ -3,12 +3,12 @@
 import config from './../../server/config';
 
 const defaults = {
-  debug: true, //Includes stats and helpers
-  kinecttransport: {
-    ports: {
-      outgoing: config.kinectTransport.ports.outgoing,
-    },
-  },
+  debug: false, //Includes stats and helpers
+  // kinecttransport: {
+  //   ports: {
+  //     outgoing: config.kinectTransport.ports.outgoing,
+  //   },
+  // },
   rooms: [
     {
       id: 0, name: 'The Void Calm',
@@ -115,7 +115,8 @@ const defaults = {
         width: 75,
       },
       enabled: false, colored: false,
-      bwURL: 'models/gltf/the_great_drawing_room/scene.gltf', colorURL: 'models/gltf/the_great_drawing_room/textures/model_Material_u1_v1_baseColor_color.jpeg',
+      bwURL: 'models/gltf/the_great_drawing_room/scene.gltf',
+      colorURL: 'models/gltf/the_great_drawing_room/textures/model_Material_u1_v1_baseColor.jpeg',
       position: new THREE.Vector3(-1.6, -0.57, -4.5),
       rotation: new THREE.Euler(0, 4.5, 0),
       scale: 0.5,
@@ -390,15 +391,15 @@ const defaults = {
           selectedRotation: new THREE.Euler(),
           selectedScale: new THREE.Vector3(1, 1, 1),
         },
-        {
-          type: 'kinect', active: false,
-          colored: true,
-          scale: 1,
-          position: new THREE.Vector3(0, 1, -2),
-          rotation: new THREE.Euler(),
-          highlightOffset: new THREE.Vector3(),
-          highlightScale: new THREE.Vector3(0.8, 0.8, 0.8),
-        },
+        // {
+        //   type: 'kinect', active: false,
+        //   colored: true,
+        //   scale: 1,
+        //   position: new THREE.Vector3(0, 1, -2),
+        //   rotation: new THREE.Euler(),
+        //   highlightOffset: new THREE.Vector3(),
+        //   highlightScale: new THREE.Vector3(0.8, 0.8, 0.8),
+        // },
       ],
       musicURL: '',
     },
@@ -406,13 +407,13 @@ const defaults = {
   fonts: [
     {
         name: 'bold',
-        json: '/bmFont/lato-bold.json',
-        png: '/bmFont/lato-bold.png',
+        json: 'bmfont/lato-bold.json',
+        png: 'bmfont/lato-bold.png',
     },
     {
         name: 'regular',
-        json: '/bmFont/lato-regular.json',
-        png: '/bmFont/lato-regular.png',
+        json: 'bmfont/lato-regular.json',
+        png: 'bmfont/lato-regular.png',
     },
   ],
 };
