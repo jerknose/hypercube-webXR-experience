@@ -6,75 +6,75 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const config = require('./server/config.js');
 
 module.exports = {
-	context: resolve(__dirname, 'src'),
-	entry: [
-		'./index.jsx',
-		// the entry point of our app
-	],
-	output: {
-		filename: '[name].[hash:10].js',
-		// the output bundle
+  context: resolve(__dirname, 'src'),
+  entry: [
+    './index.jsx',
+    // the entry point of our app
+  ],
+  output: {
+    filename: '[name].[hash:10].js',
+    // the output bundle
 
-		path: resolve(__dirname, 'dist'),
+    path: resolve(__dirname, 'dist'),
 
-		publicPath: ''
-		// necessary for HMR to know where to load the hot update chunks
-	},
-	module: {
-		rules: [
+    publicPath: ''
+    // necessary for HMR to know where to load the hot update chunks
+  },
+  module: {
+    rules: [
 
-			{
-				test: /\.(js|jsx)$/,
-				exclude: /(node_modules|bower_components)/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						presets: ['env']
-					}
-				}
-			},
-			{
-			  test: /\.css$/,
-			  loader: 'style-loader'
-			}, {
-			  test: /\.css$/,
-			  loader: 'css-loader'
-			},
-			{
-				test: /\.(eot|ttf|woff|woff2)$/,
-				loader: 'file-loader?name=fonts/[name].[ext]'
-			},
-			{
-				test: /\.obj$/,
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env']
+          }
+        }
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader'
+      }, {
+        test: /\.css$/,
+        loader: 'css-loader'
+      },
+      {
+        test: /\.(eot|ttf|woff|woff2)$/,
+        loader: 'file-loader?name=fonts/[name].[ext]'
+      },
+      {
+        test: /\.obj$/,
         loader: 'webpack-obj-loader'
-			},
-			{
-				test: /\.(jpe?g|gif|svg)$/i,
-				use: [
-					'url-loader?name=images/[name].[ext]&limit=10000',
-					'img-loader?name=images/[name].[ext]'
-				]
-			},
-			{
-				test: /\.(png)$/i,
-				use: [
-					'base64-image-loader'
-				]
-			},
+      },
+      {
+        test: /\.(jpe?g|gif|svg)$/i,
+        use: [
+          'url-loader?name=images/[name].[ext]&limit=10000',
+          'img-loader?name=images/[name].[ext]'
+        ]
+      },
+      {
+        test: /\.(png)$/i,
+        use: [
+          'base64-image-loader'
+        ]
+      },
       {
           test: /\.(glsl|frag|vert)$/,
           loader: 'webpack-glsl-loader'
-			},
-		],
-	},
-	resolve: {
-		extensions: ['.js', '.jsx', '.css']
-	},
-	plugins: [
-		new HtmlWebpackPlugin({
-			template: './html/index.html',
-		}),
-		new CopyWebpackPlugin([
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.js', '.jsx', '.css']
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './html/index.html',
+    }),
+    new CopyWebpackPlugin([
       // {
       //   from: resolve(__dirname, config.copy.html.src),
       //   to: resolve(__dirname, config.copy.html.dest),
@@ -100,7 +100,7 @@ module.exports = {
         to: resolve(__dirname, config.copy.bmfonts.dest),
       },
     ]),
-		new webpack.ProvidePlugin({
+    new webpack.ProvidePlugin({
       Rx: 'rxjs/Rx',
       _: 'lodash',
       $: 'jquery',
@@ -114,31 +114,31 @@ module.exports = {
 
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-			filename: '[name].[hash:10].js',
+      filename: '[name].[hash:10].js',
       minChunks: (module) => {
         // this assumes your vendor imports exist in the node_modules directory
         return module.context && module.context.indexOf('node_modules') !== -1;
       },
     }),
-		new webpack.DefinePlugin({
-		  'process.env': {
-		    NODE_ENV: JSON.stringify('production')
-		  }
-		}),
-		new webpack.LoaderOptionsPlugin({
-		  minimize: true,
-		  debug: false
-		}),
-		new webpack.optimize.UglifyJsPlugin({
-		  beautify: false,
-		  mangle: {
-		    screw_ie8: false,
-		    keep_fnames: true
-		  },
-		  compress: {
-		    screw_ie8: false
-		  },
-		  comments: false
-		})
-	]
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      beautify: false,
+      mangle: {
+        screw_ie8: false,
+        keep_fnames: true
+      },
+      compress: {
+        screw_ie8: false
+      },
+      comments: false
+    })
+  ]
 }
