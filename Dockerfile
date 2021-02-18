@@ -11,9 +11,8 @@ WORKDIR /usr/src/app
 # Install all node packages
 RUN yarn install
 
-# # Build project
-# RUN yarn run build
+# Build project
+RUN yarn run build
 
-# # Run file server
-# CMD ["npm", "run", "file"]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+# Run file server
+CMD ["npm", "run", "file"]
