@@ -118,8 +118,8 @@ module.exports = {
         to: resolve(__dirname, config.copy.textures.dest),
       },
       {
-        from: resolve(__dirname, config.copy.bmfonts.src),
-        to: resolve(__dirname, config.copy.bmfonts.dest),
+        from: resolve(__dirname, config.copy.bmFonts.src),
+        to: resolve(__dirname, config.copy.bmFonts.dest),
       },
     ]),
 

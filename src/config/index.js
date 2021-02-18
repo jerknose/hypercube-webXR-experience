@@ -407,13 +407,13 @@ const defaults = {
   fonts: [
     {
         name: 'bold',
-        json: 'bmfont/lato-bold.json',
-        png: 'bmfont/lato-bold.png',
+        json: 'bmFont/lato-bold.json',
+        png: 'bmFont/lato-bold.png',
     },
     {
         name: 'regular',
-        json: 'bmfont/lato-regular.json',
-        png: 'bmfont/lato-regular.png',
+        json: 'bmFont/lato-regular.json',
+        png: 'bmFont/lato-regular.png',
     },
   ],
 };
