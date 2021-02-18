@@ -1,5 +1,5 @@
-import createText from 'bmfont';
-import MSDFShader from 'bmfont/shaders/msdf';
+import createText from './bmfont';
+import MSDFShader from './bmfont/shaders/msdf';
 import PanelBG from './PanelBG';
 import Shapes from './Shapes';
 

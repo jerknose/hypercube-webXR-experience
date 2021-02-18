@@ -12,8 +12,8 @@ WORKDIR /usr/src/app
 RUN yarn install
 
 # # Build project
-RUN yarn run build
+# RUN yarn run build
 
-
-# Run file server
-CMD ["npm", "run", "file"]
+# # Run file server
+# CMD ["npm", "run", "file"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
