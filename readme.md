@@ -5,7 +5,7 @@ ___
 &nbsp;  
 ![Image for Hypercube XR](https://github.com/jerknose/hypercube-webXR-experience/blob/master/src/images/hypercube-2.gif?raw=true)  
   
-Part of an immersive theater experience where Augmented World Expo (AWE) conference attendees teamed up with our actors to solve an inter-dimensional love mystery.  
+For the 2018 Augmented World Expo, I teamed with Jasper Patterson to create a new immersive theater experience where conference attendees teamed up with our actors to solve an inter-dimensional love mystery.
   
 This one of a kind show combined Real Actors, Physical Props and Sets, Full-Color 3d Scans, Mobile AR Puzzles, Live Motion Tracking, and a Virtual Reality Game.  
 \
